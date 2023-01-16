@@ -1,8 +1,12 @@
 <template>
-  <el-tree :data="data" :props="defaultProps" @node-click="getCategories"
-           :expand-on-click-node="false"
-           node-key="catId"
-           show-checkbox>
+  <div>
+    <el-tree :data="data"
+             :props="defaultProps"
+             :expand-on-click-node="false"
+             node-key="catId"
+             show-checkbox
+             :default-expanded-keys="openCategory"
+    >
     <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
         <span>
@@ -22,7 +26,8 @@
           </el-button>
         </span>
       </span>
-  </el-tree>
+    </el-tree>
+  </div>
 </template>
 
 <script>
@@ -30,10 +35,12 @@
 export default {
   data() {
     return {
+      //需要展开的菜单
+      openCategory:[],
       data: [],
       defaultProps: {
         children: 'children',
-        label: 'name'
+        label: 'name',
       }
     };
   },
@@ -41,13 +48,36 @@ export default {
     this.getCategories()
   },
   methods: {
+    //添加菜单
     append(data) {
       console.log(data)
     },
-
+    //删除菜单
     remove(node, data) {
       console.log("node", node)
       console.log("data", data)
+      var ids=[node.data.catId]
+      this.$confirm(`确定删除【${data.name}】菜单吗?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/product/category/delete'),
+          method: 'post',
+          data: this.$http.adornData(ids, false)
+        }).then(() => {
+            this.$message({
+              message: '删除成功',
+              type: 'success',
+            })
+            //刷新页面
+            this.getCategories()
+            //设置仍要展开的菜单
+            this.openCategory=[node.parent.data.catId]//中括号！！
+
+        })
+      }).catch(() => {})
     },
     //查询分类数据
     getCategories() {
