@@ -10,7 +10,7 @@ export default {
       data: [],
       defaultProps: {
         children: 'children',
-        label: 'label'
+        label: 'name'
       }
     };
   },
@@ -24,7 +24,9 @@ export default {
         url: this.$http.adornUrl('/product/category/list/tree'),
         method: 'get'
       }).then(res=>{
-        console.log(res)
+        // console.log("res:",res)
+        // console.log("res.data",res.data)
+        this.data=res.data.data
 
       })
       // categoryApi.getCategories().then(res=>{
