@@ -21,7 +21,20 @@ import com.fosss.gulimall.product.service.CategoryService;
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
 
+    /**
+     * 逻辑删除
+     */
+    @Override
+    public void removeMenu(List<Long> catIds) {
+        //todo 检查要删除的菜单是否被其他地方引用
 
+        //实施删除
+        baseMapper.deleteBatchIds(catIds);
+    }
+
+    /**
+     * 查询所有的分类，并组装成树形(父子)结构返回
+     */
     @Override
     public List<CategoryEntity> listTree() {
         //查询所有分类

@@ -71,11 +71,11 @@ public class CategoryController {
     }
 
     /**
-     * 删除
+     * 逻辑删除
      */
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] catIds) {
-        categoryService.removeByIds(Arrays.asList(catIds));
+        categoryService.removeMenu(Arrays.asList(catIds));
 
         return R.ok();
     }
