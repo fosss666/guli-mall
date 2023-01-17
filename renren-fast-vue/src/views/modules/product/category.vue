@@ -31,11 +31,26 @@
       </span>
     </el-tree>
 
-    <!--    添加菜单的对话框-->
-    <el-dialog title="添加菜单" :visible.sync="dialogFormVisible">
+    <!--    添加修改菜单的对话框-->
+    <el-dialog :title="title" :visible.sync="dialogFormVisible">
       <el-form :model="category">
         <el-form-item label="菜单名称" width="30%">
           <el-input v-model="category.name" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <el-form :model="category">
+        <el-form-item label="图标" width="30%">
+          <el-input v-model="category.icon" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <el-form :model="category">
+        <el-form-item label="计量单位" width="30%">
+          <el-input v-model="category.productUnit" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <el-form :model="category">
+        <el-form-item label="排序" width="30%">
+          <el-input v-model="category.sort" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -51,13 +66,16 @@
 export default {
   data() {
     return {
+      title:"",
       //封装对话框数据
       category: {
         name: "",
         parentCid: 0,
         catLevel: 0,
         showStatus: 1,
-        sort: 0
+        sort: 0,
+        icon:"",
+        productUnit:""
       },
       //对话框是否可视
       dialogFormVisible: false,
@@ -89,11 +107,13 @@ export default {
     },
     //修改菜单
     updateMenu(){
+      //只传输要修改的数据，其他数据不传送，否则就会以默认值替代掉以前的数据
+      var {catId,name,icon,productUnit}=this.category
 
       this.$http({
         url: this.$http.adornUrl('/product/category/update'),
         method: 'post',
-        data: this.$http.adornData(this.category, false)
+        data: this.$http.adornData({catId,name,icon,productUnit}, false)
       }).then(() => {
         this.$message({
           message: '编辑菜单成功',
@@ -110,6 +130,7 @@ export default {
     },
     //编辑菜单
     exit(data){
+      this.title="编辑分类"
       //设置菜单id
       this.category.catId=data.catId
       //设置数据
@@ -120,6 +141,8 @@ export default {
       this.dialogFormVisible=true
       //回显数据
       this.category.name=data.name
+      this.category.icon=data.icon
+      this.category.productUnit=data.productUnit
     },
     //保存菜单
     saveMenu() {
@@ -144,8 +167,12 @@ export default {
     },
     //添加菜单
     append(data) {
-      //清空对话框的名字数据
+      this.title="新增分类"
+      //清空对话框的数据
       this.category.name = ""
+      this.category.icon=""
+      this.category.productUnit=""
+      this.category.sort=0
       // console.log("对话框数据：", data)
       this.dialogFormVisible = true;
       //设置数据
