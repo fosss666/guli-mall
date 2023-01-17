@@ -27,6 +27,19 @@
         </span>
       </span>
     </el-tree>
+
+    <!--    添加菜单的对话框-->
+    <el-dialog title="添加菜单" :visible.sync="dialogFormVisible">
+      <el-form :model="category">
+        <el-form-item label="菜单名称" width="30%">
+          <el-input v-model="category.name" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveMenu">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -35,8 +48,18 @@
 export default {
   data() {
     return {
+      //封装对话框数据
+      category: {
+        name: "",
+        parentCid: 0,
+        catLevel: 0,
+        showStatus: 1,
+        sort: 0
+      },
+      //对话框是否可视
+      dialogFormVisible: false,
       //需要展开的菜单
-      openCategory:[],
+      openCategory: [],
       data: [],
       defaultProps: {
         children: 'children',
@@ -48,15 +71,42 @@ export default {
     this.getCategories()
   },
   methods: {
+    //保存菜单
+    saveMenu() {
+
+      this.$http({
+        url: this.$http.adornUrl('/product/category/save'),
+        method: 'post',
+        data: this.$http.adornData(this.category, false)
+      }).then(() => {
+        this.$message({
+          message: '添加菜单成功',
+          type: 'success'
+        })
+        //关闭对话框
+        this.dialogFormVisible = false
+        //刷新页面
+        this.getCategories()
+        //设置仍展开的菜单
+        this.openCategory = [this.category.parentCid]
+
+      })
+    },
     //添加菜单
     append(data) {
-      console.log(data)
+      //清空对话框的名字数据
+      this.category.name = ""
+      console.log("对话框数据：", data)
+      this.dialogFormVisible = true;
+      //设置数据
+      this.category.parentCid = data.catId
+      this.category.catLevel = data.catLevel + 1
     },
     //删除菜单
     remove(node, data) {
-      console.log("node", node)
-      console.log("data", data)
-      var ids=[node.data.catId]
+      // console.log("node", node)
+      // console.log("data", data)
+      var ids = [node.data.catId]
       this.$confirm(`确定删除【${data.name}】菜单吗?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -67,17 +117,18 @@ export default {
           method: 'post',
           data: this.$http.adornData(ids, false)
         }).then(() => {
-            this.$message({
-              message: '删除成功',
-              type: 'success',
-            })
-            //刷新页面
-            this.getCategories()
-            //设置仍要展开的菜单
-            this.openCategory=[node.parent.data.catId]//中括号！！
+          this.$message({
+            message: '删除成功',
+            type: 'success',
+          })
+          //刷新页面
+          this.getCategories()
+          //设置仍要展开的菜单
+          this.openCategory = [node.parent.data.catId]//中括号！！
 
         })
-      }).catch(() => {})
+      }).catch(() => {
+      })
     },
     //查询分类数据
     getCategories() {
