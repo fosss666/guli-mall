@@ -13,16 +13,19 @@
           <el-button
             v-if="node.level<=2"
             type="text"
-            size="mini"
             @click="() => append(data)">
-            Append
+            新增
+          </el-button>
+          <el-button
+            type="text"
+            @click="() => exit(data)">
+            编辑
           </el-button>
           <el-button
             v-if="node.childNodes.length===0"
             type="text"
-            size="mini"
             @click="() => remove(node, data)">
-            Delete
+            删除
           </el-button>
         </span>
       </span>
@@ -37,7 +40,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveMenu">确 定</el-button>
+        <el-button type="primary" @click="saveOrUpdate">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -71,6 +74,53 @@ export default {
     this.getCategories()
   },
   methods: {
+    //判断时新增还是修改
+    saveOrUpdate(){
+      // console.log("菜单id",this.category.catId)
+      if(this.category.catId===undefined){
+        //调用新增方法
+        // console.log("新增")
+        this.saveMenu()
+      }else {
+        //调用修改方法
+        // console.log("修改")
+        this.updateMenu()
+      }
+    },
+    //修改菜单
+    updateMenu(){
+
+      this.$http({
+        url: this.$http.adornUrl('/product/category/update'),
+        method: 'post',
+        data: this.$http.adornData(this.category, false)
+      }).then(() => {
+        this.$message({
+          message: '编辑菜单成功',
+          type: 'success'
+        })
+        //关闭对话框
+        this.dialogFormVisible = false
+        //刷新页面
+        this.getCategories()
+        //设置仍展开的菜单
+        this.openCategory = [this.category.parentCid]
+
+      })
+    },
+    //编辑菜单
+    exit(data){
+      //设置菜单id
+      this.category.catId=data.catId
+      //设置数据
+      this.category.parentCid = data.parentCid
+      this.category.catLevel=data.catLevel
+      // console.log("编辑菜单",data)
+      //出现对话框
+      this.dialogFormVisible=true
+      //回显数据
+      this.category.name=data.name
+    },
     //保存菜单
     saveMenu() {
 
@@ -96,7 +146,7 @@ export default {
     append(data) {
       //清空对话框的名字数据
       this.category.name = ""
-      console.log("对话框数据：", data)
+      // console.log("对话框数据：", data)
       this.dialogFormVisible = true;
       //设置数据
       this.category.parentCid = data.catId
