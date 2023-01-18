@@ -6,6 +6,8 @@
              node-key="catId"
              show-checkbox
              :default-expanded-keys="openCategory"
+             draggable
+             :allow-drop="allowDrop"
     >
     <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -66,7 +68,9 @@
 export default {
   data() {
     return {
-      title:"",
+      //最大深度
+      maxLevel: 0,
+      title: "",
       //封装对话框数据
       category: {
         name: "",
@@ -74,8 +78,8 @@ export default {
         catLevel: 0,
         showStatus: 1,
         sort: 0,
-        icon:"",
-        productUnit:""
+        icon: "",
+        productUnit: ""
       },
       //对话框是否可视
       dialogFormVisible: false,
@@ -92,28 +96,59 @@ export default {
     this.getCategories()
   },
   methods: {
+    //是否允许拖拽
+    allowDrop(draggingNode, dropNode, type) {
+      console.log("draggingNode",draggingNode)
+      console.log("dropNode",dropNode)
+      console.log("type",type)
+      this.countNodeDepth(draggingNode)
+      //计算拖拽结点最大深度
+      let maxDepth = this.maxLevel - draggingNode.data.catLevel + 1;
+      if (type === "inner") {//往结点里边拖拽
+        //计算拖拽结点和放置结点的总深度
+        console.log(maxDepth)
+        console.log(dropNode.data.catLevel)
+        console.log(maxDepth + dropNode.data.catLevel)
+        return maxDepth + dropNode.data.catLevel <= 3;
+      } else {
+        //往前后拖拽
+        return maxDepth + dropNode.parent.data.catLevel <= 3
+      }
+    },
+    //计算结点的最大层级
+    countNodeDepth(node) {
+      console.log("=============node",node)
+      if (node.data.children != null && node.data.children.length > 0) {
+        for (let i = 0; i < node.data.children.length; i++) {
+          if (node.data.children[i].catLevel > this.maxLevel) {
+            this.maxLevel = node.data.children[i].catLevel
+          }
+          this.countNodeDepth(node.children[i])
+        }
+      }
+    },
     //判断时新增还是修改
-    saveOrUpdate(){
+    saveOrUpdate() {
       // console.log("菜单id",this.category.catId)
-      if(this.category.catId===undefined){
+      if (this.category.catId === undefined) {
         //调用新增方法
         // console.log("新增")
         this.saveMenu()
-      }else {
+      } else {
         //调用修改方法
         // console.log("修改")
         this.updateMenu()
       }
     },
     //修改菜单
-    updateMenu(){
+    updateMenu() {
       //只传输要修改的数据，其他数据不传送，否则就会以默认值替代掉以前的数据
-      var {catId,name,icon,productUnit}=this.category
+      var {catId, name, icon, productUnit} = this.category
 
       this.$http({
         url: this.$http.adornUrl('/product/category/update'),
         method: 'post',
-        data: this.$http.adornData({catId,name,icon,productUnit}, false)
+        data: this.$http.adornData({catId, name, icon, productUnit}, false)
       }).then(() => {
         this.$message({
           message: '编辑菜单成功',
@@ -129,20 +164,20 @@ export default {
       })
     },
     //编辑菜单
-    exit(data){
-      this.title="编辑分类"
+    exit(data) {
+      this.title = "编辑分类"
       //设置菜单id
-      this.category.catId=data.catId
+      this.category.catId = data.catId
       //设置数据
       this.category.parentCid = data.parentCid
-      this.category.catLevel=data.catLevel
+      this.category.catLevel = data.catLevel
       // console.log("编辑菜单",data)
       //出现对话框
-      this.dialogFormVisible=true
+      this.dialogFormVisible = true
       //回显数据
-      this.category.name=data.name
-      this.category.icon=data.icon
-      this.category.productUnit=data.productUnit
+      this.category.name = data.name
+      this.category.icon = data.icon
+      this.category.productUnit = data.productUnit
     },
     //保存菜单
     saveMenu() {
@@ -167,12 +202,12 @@ export default {
     },
     //添加菜单
     append(data) {
-      this.title="新增分类"
+      this.title = "新增分类"
       //清空对话框的数据
       this.category.name = ""
-      this.category.icon=""
-      this.category.productUnit=""
-      this.category.sort=0
+      this.category.icon = ""
+      this.category.productUnit = ""
+      this.category.sort = 0
       // console.log("对话框数据：", data)
       this.dialogFormVisible = true;
       //设置数据
