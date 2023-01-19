@@ -100,7 +100,7 @@ export default {
   methods: {
     //收集拖拽后的信息
     handleDrop(draggingNode, dropNode, dropType, ev) {
-      console.log("handleDrop: ", draggingNode, dropNode, dropType);
+      // console.log("handleDrop: ", draggingNode, dropNode, dropType);
       //1、当前节点最新的父节点id
       let pCid = 0;
       let siblings = null;
@@ -139,7 +139,25 @@ export default {
       }
 
       //3、当前拖拽节点的最新层级
-      console.log("updateNodes", this.updateNodes);
+      // console.log("updateNodes", this.updateNodes);
+      //进行更新
+      this.$http({
+        url: this.$http.adornUrl('/product/category/update/drag'),
+        method: 'put',
+        data: this.$http.adornData(this.updateNodes, false)
+      }).then(() => {
+        this.$message({
+          message: '修改分类顺序成功',
+          type: 'success'
+        })
+        //刷新页面
+        this.getCategories()
+        //设置仍展开的菜单
+        this.openCategory = [pCid]
+        //清空数据！！
+        this.updateNodes = []
+        this.maxLevel = 0
+      })
     },
     //更新子节点的层级并封装
     updateChildNodeLevel(node) {

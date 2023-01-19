@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,15 @@ import com.fosss.common.utils.R;
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
+
+    /**
+     * 更新拖拽后的分类排序，父id等
+     */
+    @PutMapping("/update/drag")
+    public R updateDrag(@RequestBody CategoryEntity[] categories) {
+        categoryService.updateBatchById(Arrays.asList(categories));
+        return R.ok();
+    }
 
     /**
      * 查询所有的分类，并组装成树形(父子)结构返回
