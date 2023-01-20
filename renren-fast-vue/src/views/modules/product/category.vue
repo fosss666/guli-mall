@@ -1,12 +1,19 @@
 <template>
   <div>
+    <el-switch
+      v-model="draggable"
+      inactive-text="关闭拖拽"
+      active-text="开启拖拽">
+    </el-switch>
+<!--    批量保存-->
+    <el-button @click="batchSave" v-if="draggable" size="small" type="primary" round>  批量保存</el-button>
     <el-tree :data="data"
              :props="defaultProps"
              :expand-on-click-node="false"
              node-key="catId"
              show-checkbox
              :default-expanded-keys="openCategory"
-             draggable
+             :draggable="draggable"
              :allow-drop="allowDrop"
              @node-drop="handleDrop"
     >
@@ -69,6 +76,11 @@
 export default {
   data() {
     return {
+      //拖拽后的结点的父结点
+      pCid:[],
+      //是否开启拖拽
+      draggable:false,
+      //拖拽后需要更新的数据
       updateNodes: [],
       //最大深度
       maxLevel: 0,
@@ -98,6 +110,28 @@ export default {
     this.getCategories()
   },
   methods: {
+    //批量保存
+    batchSave(){
+      //进行更新
+      this.$http({
+        url: this.$http.adornUrl('/product/category/update/drag'),
+        method: 'put',
+        data: this.$http.adornData(this.updateNodes, false)
+      }).then(() => {
+        this.$message({
+          message: '修改分类顺序成功',
+          type: 'success'
+        })
+        //刷新页面
+        this.getCategories()
+        //设置仍展开的菜单
+        this.openCategory = this.pCid
+        //清空数据！！
+        this.updateNodes = []
+        this.maxLevel = 0
+        this.pCid=[]
+      })
+    },
     //收集拖拽后的信息
     handleDrop(draggingNode, dropNode, dropType, ev) {
       // console.log("handleDrop: ", draggingNode, dropNode, dropType);
@@ -111,7 +145,7 @@ export default {
         pCid = dropNode.data.catId;
         siblings = dropNode.childNodes;
       }
-
+      this.pCid.push(pCid)
       //2、当前拖拽节点的最新顺序
       for (let i = 0; i < siblings.length; i++) {
         //如果遍历的是当前正在拖拽的节点
@@ -140,24 +174,7 @@ export default {
 
       //3、当前拖拽节点的最新层级
       // console.log("updateNodes", this.updateNodes);
-      //进行更新
-      this.$http({
-        url: this.$http.adornUrl('/product/category/update/drag'),
-        method: 'put',
-        data: this.$http.adornData(this.updateNodes, false)
-      }).then(() => {
-        this.$message({
-          message: '修改分类顺序成功',
-          type: 'success'
-        })
-        //刷新页面
-        this.getCategories()
-        //设置仍展开的菜单
-        this.openCategory = [pCid]
-        //清空数据！！
-        this.updateNodes = []
-        this.maxLevel = 0
-      })
+
     },
     //更新子节点的层级并封装
     updateChildNodeLevel(node) {

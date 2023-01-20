@@ -32,7 +32,9 @@ public class CategoryController {
      */
     @PutMapping("/update/drag")
     public R updateDrag(@RequestBody CategoryEntity[] categories) {
-        categoryService.updateBatchById(Arrays.asList(categories));
+        if (categories != null && categories.length > 0) {
+            categoryService.updateBatchById(Arrays.asList(categories));
+        }
         return R.ok();
     }
 
