@@ -7,6 +7,8 @@
     </el-switch>
     <!--    批量保存-->
     <el-button @click="batchSave" v-if="draggable" size="small" type="primary" round> 批量保存</el-button>
+    <!--    添加分类-->
+    <el-button @click="append" size="small" type="success" round> 添加分类</el-button>
     <!--    批量删除-->
     <el-button @click="batchDelete" size="small" type="danger" round> 批量删除</el-button>
 
@@ -117,12 +119,12 @@ export default {
     //批量删除
     batchDelete() {
       //获取选中的分类
-      let checkedNodes=this.$refs.menuTree.getCheckedNodes()
+      let checkedNodes = this.$refs.menuTree.getCheckedNodes()
       // console.log("选中的分类：",checkedNodes)
       //获取id,name，parentCid
-      let checkedIds=[]
-      let checkedNames=[]
-      let checkedParentCid=[]
+      let checkedIds = []
+      let checkedNames = []
+      let checkedParentCid = []
       for (let i = 0; i < checkedNodes.length; i++) {
         checkedIds.push(checkedNodes[i].catId)
         checkedNames.push(checkedNodes[i].name)
@@ -148,7 +150,7 @@ export default {
           this.getCategories()
           //设置仍要展开的分类
           // console.log("要展开的分类",checkedParentCid)
-          this.openCategory=checkedParentCid
+          this.openCategory = checkedParentCid
         })
       }).catch(() => {
       })
@@ -361,7 +363,8 @@ export default {
       // console.log("对话框数据：", data)
       this.dialogFormVisible = true;
       //设置数据
-      this.category.parentCid = data.catId
+      console.log("添加的数据", data.catId)
+      this.category.parentCid = data.catId===undefined?0:data.catId
       this.category.catLevel = data.catLevel + 1
     },
     //删除菜单
