@@ -81,8 +81,11 @@ public class CategoryController {
     /**
      * 逻辑删除
      */
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public R delete(@RequestBody Long[] catIds) {
+        if (catIds == null || catIds.length == 0) {
+            return R.ok();
+        }
         categoryService.removeMenu(Arrays.asList(catIds));
 
         return R.ok();

@@ -5,8 +5,11 @@
       inactive-text="关闭拖拽"
       active-text="开启拖拽">
     </el-switch>
-<!--    批量保存-->
-    <el-button @click="batchSave" v-if="draggable" size="small" type="primary" round>  批量保存</el-button>
+    <!--    批量保存-->
+    <el-button @click="batchSave" v-if="draggable" size="small" type="primary" round> 批量保存</el-button>
+    <!--    批量删除-->
+    <el-button @click="batchDelete" size="small" type="danger" round> 批量删除</el-button>
+
     <el-tree :data="data"
              :props="defaultProps"
              :expand-on-click-node="false"
@@ -16,8 +19,9 @@
              :draggable="draggable"
              :allow-drop="allowDrop"
              @node-drop="handleDrop"
-    >
-    <span class="custom-tree-node" slot-scope="{ node, data }">
+             ref="menuTree">
+      >
+      <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
         <span>
           <el-button
@@ -76,10 +80,10 @@
 export default {
   data() {
     return {
-      //拖拽后的结点的父结点
-      pCid:[],
+      //仍要展开的结点
+      pCid: [],
       //是否开启拖拽
-      draggable:false,
+      draggable: false,
       //拖拽后需要更新的数据
       updateNodes: [],
       //最大深度
@@ -110,27 +114,76 @@ export default {
     this.getCategories()
   },
   methods: {
-    //批量保存
-    batchSave(){
-      //进行更新
-      this.$http({
-        url: this.$http.adornUrl('/product/category/update/drag'),
-        method: 'put',
-        data: this.$http.adornData(this.updateNodes, false)
+    //批量删除
+    batchDelete() {
+      //获取选中的分类
+      let checkedNodes=this.$refs.menuTree.getCheckedNodes()
+      // console.log("选中的分类：",checkedNodes)
+      //获取id,name，parentCid
+      let checkedIds=[]
+      let checkedNames=[]
+      let checkedParentCid=[]
+      for (let i = 0; i < checkedNodes.length; i++) {
+        checkedIds.push(checkedNodes[i].catId)
+        checkedNames.push(checkedNodes[i].name)
+        checkedParentCid.push(checkedNodes[i].parentCid)
+      }
+      // console.log("要展开的分类1",checkedParentCid)
+      // console.log("选中的id",checkedIds)
+      this.$confirm(`确定删除【${checkedNames}】这些分类吗?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       }).then(() => {
-        this.$message({
-          message: '修改分类顺序成功',
-          type: 'success'
+        this.$http({
+          url: this.$http.adornUrl('/product/category/delete'),
+          method: 'delete',
+          data: this.$http.adornData(checkedIds, false)
+        }).then(() => {
+          this.$message({
+            message: '批量删除成功',
+            type: 'success'
+          })
+          //刷新页面
+          this.getCategories()
+          //设置仍要展开的分类
+          // console.log("要展开的分类",checkedParentCid)
+          this.openCategory=checkedParentCid
         })
-        //刷新页面
-        this.getCategories()
-        //设置仍展开的菜单
-        this.openCategory = this.pCid
-        //清空数据！！
-        this.updateNodes = []
-        this.maxLevel = 0
-        this.pCid=[]
+      }).catch(() => {
       })
+
+    },
+
+    //批量保存
+    batchSave() {
+      //进行更新
+      this.$confirm(`确定要更新这些分类的顺序吗?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/product/category/update/drag'),
+          method: 'put',
+          data: this.$http.adornData(this.updateNodes, false)
+        }).then(() => {
+          this.$message({
+            message: '修改分类顺序成功',
+            type: 'success'
+          })
+          //刷新页面
+          this.getCategories()
+          //设置仍展开的菜单
+          this.openCategory = this.pCid
+          //清空数据！！
+          this.updateNodes = []
+          this.maxLevel = 0
+          this.pCid = []
+        })
+      }).catch(() => {
+      })
+
     },
     //收集拖拽后的信息
     handleDrop(draggingNode, dropNode, dropType, ev) {
@@ -323,7 +376,7 @@ export default {
       }).then(() => {
         this.$http({
           url: this.$http.adornUrl('/product/category/delete'),
-          method: 'post',
+          method: 'delete',
           data: this.$http.adornData(ids, false)
         }).then(() => {
           this.$message({
