@@ -363,7 +363,7 @@ export default {
       // console.log("对话框数据：", data)
       this.dialogFormVisible = true;
       //设置数据
-      console.log("添加的数据", data.catId)
+      // console.log("添加的数据", data.catId)
       this.category.parentCid = data.catId===undefined?0:data.catId
       this.category.catLevel = data.catLevel + 1
     },
