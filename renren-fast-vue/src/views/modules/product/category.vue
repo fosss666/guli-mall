@@ -299,7 +299,7 @@ export default {
 
       this.$http({
         url: this.$http.adornUrl('/product/category/update'),
-        method: 'post',
+        method: 'put',
         data: this.$http.adornData({catId, name, icon, productUnit}, false)
       }).then(() => {
         this.$message({

@@ -1,3 +1,5 @@
+server:
+  port: 10000
 spring:
   datasource:
     username: root
@@ -17,6 +19,5 @@ mybatis-plus:
       id-type: auto
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-server:
-  port: 10000
+
 

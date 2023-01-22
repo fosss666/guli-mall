@@ -50,7 +50,18 @@
         prop="showStatus"
         header-align="center"
         align="center"
-        label="显示状态[0-不显示；1-显示]">
+        label="显示状态">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.showStatus"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            :active-value="1"
+            :inactive-value="0"
+            @change="changeBrandStatus(scope.row)"
+          >
+          </el-switch>
+        </template>
       </el-table-column>
       <el-table-column
         prop="firstLetter"
@@ -114,6 +125,19 @@
       this.getDataList()
     },
     methods: {
+      //改变品牌状态
+      changeBrandStatus(row){
+        // console.log(row)
+        //结构所需数据
+        let {brandId,showStatus}=row
+        this.$http({
+          url:this.$http.adornUrl('/product/brand/update'),
+          method:'put',
+          data:this.$http.adornData({brandId,showStatus},false)
+        }).then(()=>{
+          this.$message.success("修改状态成功")
+        })
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
@@ -129,6 +153,7 @@
           if (data && data.code === 0) {
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
+            console.log("获取到的品牌数据",this.dataList)
           } else {
             this.dataList = []
             this.totalPage = 0

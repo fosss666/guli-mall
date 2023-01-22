@@ -1,3 +1,5 @@
+server:
+  port: 8000
 spring:
   datasource:
     username: root
@@ -15,5 +17,3 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
-server:
-  port: 8000

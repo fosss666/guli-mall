@@ -71,7 +71,7 @@ public class CategoryController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @PutMapping("/update")
     public R update(@RequestBody CategoryEntity category) {
         categoryService.updateById(category);
 
