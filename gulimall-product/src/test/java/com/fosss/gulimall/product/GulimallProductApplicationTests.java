@@ -1,5 +1,6 @@
 package com.fosss.gulimall.product;
 
+import com.aliyun.oss.OSSClient;
 import com.fosss.gulimall.product.entity.BrandEntity;
 import com.fosss.gulimall.product.service.BrandService;
 import org.junit.Test;
@@ -8,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,6 +19,20 @@ import java.util.List;
 public class GulimallProductApplicationTests {
     @Resource
     private BrandService brandService;
+    @Resource
+    private OSSClient ossClient;
+
+    /**
+     * 测试上传文件到oss
+     */
+    @Test
+    public void testUpload() throws FileNotFoundException {
+        ossClient.putObject(
+                "gulimall-fosss",
+                "test.png",
+                new FileInputStream("C:\\Users\\lenovo\\Pictures\\壁纸\\背景.png"));
+        ossClient.shutdown();
+    }
 
     /**
      * 测试添加品牌
