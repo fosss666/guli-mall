@@ -3,7 +3,7 @@
     :title="!dataForm.brandId ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
+    <el-form :model="dataForm" status-icon :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
              label-width="120px">
       <el-form-item label="品牌名" prop="name">
         <el-input v-model="dataForm.name" placeholder="品牌名"></el-input>
@@ -27,7 +27,8 @@
         <el-input v-model="dataForm.firstLetter" placeholder="检索首字母"></el-input>
       </el-form-item>
       <el-form-item label="排序" prop="sort">
-        <el-input v-model="dataForm.sort" placeholder="排序"></el-input>
+        <!--        <el-input v-model="dataForm.sort" placeholder="排序"></el-input>-->
+        <el-input-number v-model="dataForm.sort" :min="0"></el-input-number>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -52,9 +53,9 @@ export default {
         name: '',
         logo: '',
         descript: '',
-        showStatus: '',
+        showStatus: 1,
         firstLetter: '',
-        sort: ''
+        sort: 0
       },
       dataRule: {
         name: [
@@ -69,12 +70,22 @@ export default {
         showStatus: [
           {required: true, message: '显示状态[0-不显示；1-显示]不能为空', trigger: 'blur'}
         ],
-        firstLetter: [
-          {required: true, message: '检索首字母不能为空', trigger: 'blur'}
-        ],
-        sort: [
-          {required: true, message: '排序不能为空', trigger: 'blur'}
-        ]
+        firstLetter:
+          [{
+            validator: (rule, value, callback) => {
+              if (value === '') {
+                callback(new Error("首字母不能为空"))
+              } else if (!/^[a-zA-Z]$/.test(value)) {
+                callback(new Error("首字母必须为a-z或A-Z之间的单个字母"))
+              } else {
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }],
+        // sort: [
+        //   {required: true, message: '排序不能为空', trigger: 'blur'}
+        // ]
       }
     }
   },
