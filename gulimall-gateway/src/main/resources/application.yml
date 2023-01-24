@@ -13,12 +13,20 @@ spring:
           uri: https://www.baidu.com
           predicates:
             - Query=url, baidu
+
+        - id: third_party_route
+          uri: lb://gulimall-third-party #负载均衡到nacos的注册中心中的gulimall-third-party
+          predicates:
+            - Path=/api/thirdparty/**
+          filters:
+            - RewritePath=/api/thirdparty/(?<segment>.*),/$\{segment}
+
         - id: product_route
           uri: lb://gulimall-product #负载均衡到nacos的注册中心中的gulimall-product
           predicates:
             - Path=/api/product/**
           filters:
-              - RewritePath=/api/(?<segment>.*),/$\{segment}
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
         - id: admin_route
           uri: lb://renren-fast #负载均衡到nacos的注册中心中的renren-fast
           predicates:
