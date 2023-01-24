@@ -7,6 +7,7 @@ import com.aliyun.oss.model.PolicyConditions;
 import com.fosss.common.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +39,7 @@ public class OssController {
     private String accessId;
 
 
-    @RequestMapping("/oss/policy")
+    @GetMapping("/oss/policy")
     public R policy() {
 
 
@@ -48,7 +49,7 @@ public class OssController {
         String host = "https://" + bucket + "." + endpoint; // host的格式为 bucketname.endpoint
         // callbackUrl为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
 //        String callbackUrl = "http://88.88.88.88:8888";
-        String format = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String format = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
         String dir = format + "/"; // 用户上传文件时指定的前缀。
 
         Map<String, String> respMap = null;
