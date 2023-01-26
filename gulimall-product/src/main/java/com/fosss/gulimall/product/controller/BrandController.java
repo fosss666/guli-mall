@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fosss.common.validGroup.AddGroup;
+import com.fosss.common.validGroup.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.fosss.gulimall.product.entity.BrandEntity;
@@ -66,7 +69,7 @@ public class BrandController {
      */
     @RequestMapping("/save")
     //Valid JSR303数据校验
-    public R save(@Valid @RequestBody BrandEntity brand/*, BindingResult result*/) {
+    public R save(/*@Valid*/ @Validated(AddGroup.class) @RequestBody BrandEntity brand/*, BindingResult result*/) {
         //if (result.hasErrors()) {
         //    HashMap<String, String> map = new HashMap<>();
         //    result.getFieldErrors().forEach((item) -> {
@@ -84,7 +87,7 @@ public class BrandController {
      * 修改
      */
     @PostMapping("/update")
-    public R update(@RequestBody BrandEntity brand) {
+    public R update(@Validated(UpdateGroup.class) @RequestBody BrandEntity brand) {
         brandService.updateById(brand);
 
         return R.ok();
