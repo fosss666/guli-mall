@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.fosss.common.valid.groups.AddGroup;
 import com.fosss.common.valid.groups.UpdateGroup;
+import com.fosss.common.valid.groups.UpdateStatusGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -75,6 +76,16 @@ public class BrandController {
         //    return R.error(400, "表单内容有误").put("data", map);
         //}
         brandService.save(brand);
+        return R.ok();
+    }
+
+    /**
+     * 修改展示状态
+     */
+    @PostMapping("/update/status")
+    public R updateStatus(@Validated(UpdateStatusGroup.class) @RequestBody BrandEntity brand) {
+        brandService.updateById(brand);
+
         return R.ok();
     }
 

@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 
+import com.fosss.common.valid.MyAnnotation.ListValue;
 import com.fosss.common.valid.groups.AddGroup;
 import com.fosss.common.valid.groups.UpdateGroup;
+import com.fosss.common.valid.groups.UpdateStatusGroup;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -50,6 +52,8 @@ public class BrandEntity implements Serializable {
     /**
      * 显示状态[0-不显示；1-显示]
      */
+    //使用自定义校验注解
+    @ListValue(message = "状态不能为0，1以外的值", vals = {0, 1}, groups = {AddGroup.class, UpdateGroup.class, UpdateStatusGroup.class})
     @NotNull(message = "显示状态不能为空", groups = AddGroup.class)
     private Integer showStatus;
     /**

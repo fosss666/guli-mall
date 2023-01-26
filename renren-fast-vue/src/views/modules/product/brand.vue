@@ -137,8 +137,8 @@ export default {
       //结构所需数据
       let {brandId, showStatus} = row
       this.$http({
-        url: this.$http.adornUrl('/product/brand/update'),
-        method: 'put',
+        url: this.$http.adornUrl('/product/brand/update/status'),
+        method: 'post',
         data: this.$http.adornData({brandId, showStatus}, false)
       }).then(() => {
         this.$message.success("修改状态成功")
