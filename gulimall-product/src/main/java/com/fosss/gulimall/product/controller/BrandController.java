@@ -1,15 +1,12 @@
 package com.fosss.gulimall.product.controller;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fosss.common.validGroup.AddGroup;
-import com.fosss.common.validGroup.UpdateGroup;
+import com.fosss.common.valid.groups.AddGroup;
+import com.fosss.common.valid.groups.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +14,6 @@ import com.fosss.gulimall.product.entity.BrandEntity;
 import com.fosss.gulimall.product.service.BrandService;
 import com.fosss.common.utils.PageUtils;
 import com.fosss.common.utils.R;
-
-import javax.validation.Valid;
 
 
 /**

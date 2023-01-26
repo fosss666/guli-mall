@@ -1,4 +1,4 @@
-package com.fosss.common.validGroup;
+package com.fosss.common.valid.groups;
 
 /**
  * @author fosss
@@ -6,5 +6,5 @@ package com.fosss.common.validGroup;
  * @description：
  * 分组校验的组名
  */
-public interface AddGroup {
+public interface UpdateGroup {
 }

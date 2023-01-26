@@ -4,10 +4,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
-import java.util.Date;
 
-import com.fosss.common.validGroup.AddGroup;
-import com.fosss.common.validGroup.UpdateGroup;
+import com.fosss.common.valid.groups.AddGroup;
+import com.fosss.common.valid.groups.UpdateGroup;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -57,7 +56,7 @@ public class BrandEntity implements Serializable {
      * 检索首字母
      */
     @NotBlank(message = "检索首字母不能为空", groups = {AddGroup.class})
-    @Pattern(regexp = "/^[a-zA-Z]$/", message = "检索首字母应为a-z或A-Z的一个字母", groups = {AddGroup.class, UpdateGroup.class})
+    @Pattern(regexp = "^[a-zA-Z]$", message = "检索首字母应为a-z或A-Z的一个字母", groups = {AddGroup.class, UpdateGroup.class})
     private String firstLetter;
     /**
      * 排序
