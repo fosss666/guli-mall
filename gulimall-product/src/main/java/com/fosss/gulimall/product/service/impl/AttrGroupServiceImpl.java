@@ -52,12 +52,6 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         LambdaQueryWrapper<AttrGroupEntity> wrapper = new LambdaQueryWrapper<>();
         Page<AttrGroupEntity> iPage = new Page<>(Integer.parseInt("" + page), Integer.parseInt("" + limit));
 
-        //和前端约定如果catelogId为0，则查询全部
-        if (catelogId == 0) {
-            IPage<AttrGroupEntity> attrGroupEntityIPage = baseMapper.selectPage(iPage, null);
-            return new PageUtils(attrGroupEntityIPage);
-        }
-
         // else 条件查询
         if (StringUtils.isNotEmpty(key)) {
             wrapper
@@ -65,6 +59,13 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                     .or().like(AttrGroupEntity::getAttrGroupName, key)
                     .or().like(AttrGroupEntity::getDescript, key);
         }
+
+        //和前端约定如果catelogId为0，则查询全部
+        if (catelogId == 0) {
+            IPage<AttrGroupEntity> attrGroupEntityIPage = baseMapper.selectPage(iPage, wrapper);
+            return new PageUtils(attrGroupEntityIPage);
+        }
+
         wrapper.last(StringUtils.isNotEmpty(sixdx) && StringUtils.isNotEmpty(order),
                 "ORDER BY " + sixdx + " " + order);
         baseMapper.selectPage(iPage, wrapper);
