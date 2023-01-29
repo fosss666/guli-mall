@@ -59,7 +59,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         Page<AttrGroupEntity> iPage = new Page<>(Integer.parseInt("" + page), Integer.parseInt("" + limit));
 
         // else 条件查询
-        if (StringUtils.isNotEmpty(key)) {
+        if (StringUtils.isNotBlank(key)) {
             wrapper
                     .like(AttrGroupEntity::getAttrGroupId, key)
                     .or().like(AttrGroupEntity::getAttrGroupName, key)
@@ -73,7 +73,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         }
 
         wrapper.eq(AttrGroupEntity::getCatelogId, catelogId)
-                .last(StringUtils.isNotEmpty(sixdx) && StringUtils.isNotEmpty(order),
+                .last(StringUtils.isNotBlank(sixdx) && StringUtils.isNotBlank(order),
                         "ORDER BY " + sixdx + " " + order);
         baseMapper.selectPage(iPage, wrapper);
 

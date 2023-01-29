@@ -21,9 +21,14 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        String key = (String) params.get("key");
         IPage<BrandEntity> page = this.page(
                 new Query<BrandEntity>().getPage(params),
-                new LambdaQueryWrapper<BrandEntity>().orderByAsc(BrandEntity::getSort)
+                new LambdaQueryWrapper<BrandEntity>()
+                        .orderByAsc(BrandEntity::getSort)
+                        .like(BrandEntity::getBrandId,key)
+                        .or().like(BrandEntity::getName,key)
+                        .or().like(BrandEntity::getDescript,key)
         );
 
         return new PageUtils(page);
