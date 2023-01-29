@@ -1,6 +1,8 @@
 package com.fosss.gulimall.product;
 
+import com.fosss.gulimall.product.entity.AttrGroupEntity;
 import com.fosss.gulimall.product.entity.BrandEntity;
+import com.fosss.gulimall.product.service.AttrGroupService;
 import com.fosss.gulimall.product.service.BrandService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,7 +21,18 @@ import java.util.List;
 public class GulimallProductApplicationTests {
     @Resource
     private BrandService brandService;
+    @Resource
+    private AttrGroupService attrGroupService;
 
+    /**
+     * 测试获取分类的完整路径
+     */
+    @Test
+    public void testGetPath(){
+        AttrGroupEntity info = attrGroupService.getInfo(1L);
+        Long[] catelogPath = info.getCatelogPath();
+        System.out.println("catelogPath = " + Arrays.toString(catelogPath));
+    }
 
     /**
      * 测试添加品牌

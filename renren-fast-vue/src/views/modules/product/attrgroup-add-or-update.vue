@@ -75,7 +75,7 @@ export default {
     };
   },
   components:{CategoryCascader},
-  
+
   methods: {
     dialogClose(){
       this.catelogPath = [];
@@ -131,7 +131,7 @@ export default {
               sort: this.dataForm.sort,
               descript: this.dataForm.descript,
               icon: this.dataForm.icon,
-              catelogId: this.catelogPath[this.catelogPath.length-1]
+              catelogId: this.catelogPath[this.catelogPath.length-1]//三级分类中最后一个id（第三层）
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {
