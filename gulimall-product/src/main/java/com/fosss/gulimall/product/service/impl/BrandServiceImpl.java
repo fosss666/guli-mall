@@ -60,6 +60,7 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
     /**
      * 删除
      */
+    @Transactional
     @Override
     public void removeDetails(List<Long> asList) {
 

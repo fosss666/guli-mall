@@ -15,12 +15,7 @@
         <result property="productUnit" column="product_unit"/>
         <result property="productCount" column="product_count"/>
     </resultMap>
-    <!--修改,同时修改品牌分类关系表中的数据-->
-    <update id="updateDetails">
-        update 'pms_category_brand_relation'
-        set catelog_name=#{name}
-        where catelog_id = #{catId}
-    </update>
+
 
 
 </mapper>

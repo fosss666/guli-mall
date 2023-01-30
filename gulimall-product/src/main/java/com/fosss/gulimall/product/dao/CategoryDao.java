@@ -14,8 +14,5 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface CategoryDao extends BaseMapper<CategoryEntity> {
-    /**
-     * 修改,同时修改品牌分类关系表中的数据
-     */
-    void updateDetails(@Param("catId") Long catId, @Param("name") String name);
+
 }

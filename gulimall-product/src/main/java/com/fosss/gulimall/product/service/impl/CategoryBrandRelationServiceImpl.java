@@ -79,6 +79,29 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         baseMapper.delete(new LambdaUpdateWrapper<CategoryBrandRelationEntity>().in(CategoryBrandRelationEntity::getBrandId, id));
     }
 
+    /**
+     * 删除品牌分类关系表中的数据
+     *
+     * @param catIds
+     */
+    @Override
+    public void deleteCategories(List<Long> catIds) {
+        LambdaUpdateWrapper<CategoryBrandRelationEntity> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.in(CategoryBrandRelationEntity::getCatelogId, catIds);
+        baseMapper.delete(wrapper);
+    }
+
+    /**
+     * 修改
+     *
+     * @param catId
+     * @param name
+     */
+    @Override
+    public void updateDetails(Long catId, String name) {
+        baseMapper.updateCategory(catId, name);
+    }
+
 }
 
 

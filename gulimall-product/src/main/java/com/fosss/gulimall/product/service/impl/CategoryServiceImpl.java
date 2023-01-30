@@ -1,5 +1,6 @@
 package com.fosss.gulimall.product.service.impl;
 
+import com.fosss.gulimall.product.service.CategoryBrandRelationService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,27 +17,37 @@ import com.fosss.common.utils.Query;
 import com.fosss.gulimall.product.dao.CategoryDao;
 import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.annotation.Resource;
 
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+    @Resource
+    private CategoryBrandRelationService categoryBrandRelationService;
 
     /**
      * 逻辑删除
      */
     @Override
+    @Transactional
     public void removeMenu(List<Long> catIds) {
-        //todo 检查要删除的菜单是否被其他地方引用
+        //删除品牌分类关系表中的数据
+        categoryBrandRelationService.deleteCategories(catIds);
 
         //实施删除
         baseMapper.deleteBatchIds(catIds);
     }
+
     /**
      * 修改,同时修改品牌分类关系表中的数据
      */
     @Override
     public void updateDetails(CategoryEntity category) {
-        baseMapper.updateDetails(category.getCatId(),category.getName());
+        baseMapper.updateById(category);
+        categoryBrandRelationService.updateDetails(category.getCatId(), category.getName());
     }
 
     /**

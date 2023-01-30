@@ -34,5 +34,18 @@ public interface CategoryBrandRelationService extends IService<CategoryBrandRela
      * @param id
      */
     void deleteBrand(List<Long> id);
+
+    /**
+     * 删除品牌分类关系表中的数据
+     * @param catIds
+     */
+    void deleteCategories(List<Long> catIds);
+
+    /**
+     * 修改
+     * @param catId
+     * @param name
+     */
+    void updateDetails(Long catId, String name);
 }
 
