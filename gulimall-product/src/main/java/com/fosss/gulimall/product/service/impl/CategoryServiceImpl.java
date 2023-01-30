@@ -45,6 +45,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * 修改,同时修改品牌分类关系表中的数据
      */
     @Override
+    @Transactional
     public void updateDetails(CategoryEntity category) {
         baseMapper.updateById(category);
         categoryBrandRelationService.updateDetails(category.getCatId(), category.getName());
