@@ -31,6 +31,13 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         //实施删除
         baseMapper.deleteBatchIds(catIds);
     }
+    /**
+     * 修改,同时修改品牌分类关系表中的数据
+     */
+    @Override
+    public void updateDetails(CategoryEntity category) {
+        baseMapper.updateDetails(category.getCatId(),category.getName());
+    }
 
     /**
      * 查询所有的分类，并组装成树形(父子)结构返回
