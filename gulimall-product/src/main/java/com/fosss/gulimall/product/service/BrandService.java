@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.fosss.common.utils.PageUtils;
 import com.fosss.gulimall.product.entity.BrandEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,5 +21,10 @@ public interface BrandService extends IService<BrandEntity> {
      * 修改
      */
     void updateDetails(BrandEntity brand);
+
+    /**
+     * 删除
+     */
+    void removeDetails(List<Long> asList);
 }
 

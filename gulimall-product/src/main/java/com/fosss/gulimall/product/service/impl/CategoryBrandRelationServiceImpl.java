@@ -1,6 +1,7 @@
 package com.fosss.gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fosss.common.utils.PageUtils;
@@ -15,6 +16,7 @@ import com.fosss.gulimall.product.service.CategoryBrandRelationService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 
@@ -62,7 +64,19 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         CategoryBrandRelationEntity categoryBrandRelationEntity = new CategoryBrandRelationEntity();
         categoryBrandRelationEntity.setBrandId(brandId);
         categoryBrandRelationEntity.setBrandName(name);
-        baseMapper.insert(categoryBrandRelationEntity);
+        baseMapper.update(
+                categoryBrandRelationEntity,
+                new LambdaUpdateWrapper<CategoryBrandRelationEntity>().eq(CategoryBrandRelationEntity::getBrandId, brandId));
+    }
+
+    /**
+     * 删除品牌时同步删除品牌分类关系表中的数据
+     *
+     * @param id
+     */
+    @Override
+    public void deleteBrand(List<Long> id) {
+        baseMapper.delete(new LambdaUpdateWrapper<CategoryBrandRelationEntity>().in(CategoryBrandRelationEntity::getBrandId, id));
     }
 
 }

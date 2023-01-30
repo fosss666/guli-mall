@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.fosss.common.utils.PageUtils;
 import com.fosss.gulimall.product.entity.CategoryBrandRelationEntity;
 
-import javax.validation.constraints.Null;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,5 +28,11 @@ public interface CategoryBrandRelationService extends IService<CategoryBrandRela
      * @param name
      */
     void updateBrand( Long brandId,  String name);
+
+    /**
+     * 删除品牌时同步删除品牌分类关系表中的数据
+     * @param id
+     */
+    void deleteBrand(List<Long> id);
 }
 

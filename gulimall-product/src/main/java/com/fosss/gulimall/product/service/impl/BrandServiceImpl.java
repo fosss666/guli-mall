@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fosss.gulimall.product.service.CategoryBrandRelationService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -54,6 +55,20 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
         if (StringUtils.isNotBlank(brand.getName())) {
             categoryBrandRelationService.updateBrand(brand.getBrandId(), brand.getName());
         }
+    }
+
+    /**
+     * 删除
+     */
+    @Override
+    public void removeDetails(List<Long> asList) {
+
+
+        //1.删除品牌
+        baseMapper.deleteBatchIds(asList);
+        //2.同步删除品牌分类关系表中的数据
+        categoryBrandRelationService.deleteBrand(asList);
+
     }
 
 }
