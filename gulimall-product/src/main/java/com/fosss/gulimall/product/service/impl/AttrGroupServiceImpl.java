@@ -2,26 +2,23 @@ package com.fosss.gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fosss.gulimall.product.dao.CategoryDao;
-import com.fosss.gulimall.product.entity.CategoryEntity;
-import org.springframework.stereotype.Service;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fosss.common.utils.PageUtils;
-
 import com.fosss.gulimall.product.dao.AttrGroupDao;
+import com.fosss.gulimall.product.dao.CategoryDao;
 import com.fosss.gulimall.product.entity.AttrGroupEntity;
+import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.service.AttrGroupService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
+import java.util.Map;
 
-
+@Slf4j
 @Service("attrGroupService")
 public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEntity> implements AttrGroupService {
 
@@ -59,7 +56,11 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         Page<AttrGroupEntity> iPage = new Page<>(Integer.parseInt("" + page), Integer.parseInt("" + limit));
 
         // else 条件查询
-        if (StringUtils.isNotBlank(key)) {
+        //log.info(key);
+        //boolean flag = StringUtils.isEmpty(key);
+        //boolean aNull = key.equals("null");
+        //不知道为什么传来的是个"null"这个字符串
+        if (!StringUtils.isEmpty(key) && !key.equals("null")) {
             wrapper
                     .like(AttrGroupEntity::getAttrGroupId, key)
                     .or().like(AttrGroupEntity::getAttrGroupName, key)
@@ -71,10 +72,11 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             IPage<AttrGroupEntity> attrGroupEntityIPage = baseMapper.selectPage(iPage, wrapper);
             return new PageUtils(attrGroupEntityIPage);
         }
-
-        wrapper.eq(AttrGroupEntity::getCatelogId, catelogId)
-                .last(StringUtils.isNotBlank(sixdx) && StringUtils.isNotBlank(order),
-                        "ORDER BY " + sixdx + " " + order);
+        //if (sixdx!=null&&sixdx.length()>0&&order!=null&&order.length()>0) {
+        //    wrapper.eq(AttrGroupEntity::getCatelogId, catelogId)
+        //            .last("ORDER BY " + sixdx + " " + order);
+        //}
+        wrapper.eq(AttrGroupEntity::getCatelogId, catelogId);
         baseMapper.selectPage(iPage, wrapper);
 
         return new PageUtils(iPage);

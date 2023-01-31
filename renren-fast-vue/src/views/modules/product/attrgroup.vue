@@ -140,8 +140,8 @@ export default {
           page: this.pageIndex,
           limit: this.pageSize,
           key: this.dataForm.key,
-          sidx: 'attr_group_id',//排序字段
-          order: 'asc',//排序方式
+          // sidx: 'attr_group_id',//排序字段
+          // order: 'asc',//排序方式
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
