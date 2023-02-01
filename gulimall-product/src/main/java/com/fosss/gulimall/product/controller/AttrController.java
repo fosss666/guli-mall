@@ -3,6 +3,7 @@ package com.fosss.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.fosss.gulimall.product.vo.AttrRespVo;
 import com.fosss.gulimall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,11 +43,11 @@ public class AttrController {
 
 
     /**
-     * 信息
+     * 查询属性详情
      */
     @RequestMapping("/info/{attrId}")
     public R info(@PathVariable("attrId") Long attrId) {
-        AttrEntity attr = attrService.getById(attrId);
+        AttrRespVo attr = attrService.getInfo(attrId);
 
         return R.ok().put("attr", attr);
     }

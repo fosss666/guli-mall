@@ -1,5 +1,6 @@
 package com.fosss.gulimall.product.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
@@ -53,5 +54,6 @@ public class AttrVo {
     /**
      * 所属分组id
      */
+    @TableField(exist = false)
     private Long attrGroupId;
 }

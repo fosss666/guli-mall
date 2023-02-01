@@ -8,12 +8,15 @@ import com.fosss.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.fosss.gulimall.product.entity.AttrGroupEntity;
 import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.service.AttrAttrgroupRelationService;
+import com.fosss.gulimall.product.service.AttrGroupService;
 import com.fosss.gulimall.product.vo.AttrRespVo;
 import com.fosss.gulimall.product.vo.AttrVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,6 +47,8 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     private AttrAttrgroupRelationDao attrAttrgroupRelationDao;
     @Resource
     private AttrGroupDao attrGroupDao;
+    @Resource
+    private AttrGroupService attrGroupService;
 
     @Override
     public PageUtils queryPage(Long catelogId, Map<String, Object> params) {
@@ -100,6 +105,29 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         attrAttrgroupRelationEntity.setAttrId(attrEntity.getAttrId());
         attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
         relationService.save(attrAttrgroupRelationEntity);
+    }
+
+    /**
+     * 查询属性详情
+     */
+    @Override
+    public AttrRespVo getInfo(Long attrId) {
+        //先查询标准数据
+        AttrEntity attrEntity = baseMapper.selectById(attrId);
+        //设置返回数据
+        AttrRespVo attrRespVo = new AttrRespVo();
+        BeanUtils.copyProperties(attrEntity, attrRespVo);
+        //查询所属分组
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, attrEntity.getAttrId()));
+        attrRespVo.setAttrGroupId(attrAttrgroupRelationEntity.getAttrGroupId());
+        //查询所属分类
+        Long catelogId = attrEntity.getCatelogId();
+        CategoryEntity categoryEntity = categoryDao.selectById(catelogId);
+        LinkedList<Long> list = new LinkedList<>();
+        //查询分类完整路径
+        LinkedList<Long> catelogPath = attrGroupService.getCatelogPath(categoryEntity, list);
+        attrRespVo.setCatelogPath(catelogPath.toArray(new Long[]{}));
+        return attrRespVo;
     }
 
 }

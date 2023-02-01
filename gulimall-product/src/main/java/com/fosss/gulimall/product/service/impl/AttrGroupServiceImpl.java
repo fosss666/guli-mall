@@ -97,12 +97,15 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         CategoryEntity categoryEntity = categoryDao.selectById(attrGroup.getCatelogId());
         //设置分组的完整路径，用于级联选择器的回显
         LinkedList<Long> list = new LinkedList<>();
-        getCatelogPath(categoryEntity, list);
-        attrGroup.setCatelogPath(list.toArray(new Long[list.size()]));
+        LinkedList<Long> catelogPath = getCatelogPath(categoryEntity, list);
+        attrGroup.setCatelogPath(catelogPath.toArray(new Long[catelogPath.size()]));
         return attrGroup;
     }
 
-    private void getCatelogPath(CategoryEntity categoryEntity, LinkedList<Long> list) {
+    /**
+     * 获取分类完整路径
+     */
+    public LinkedList<Long>  getCatelogPath(CategoryEntity categoryEntity, LinkedList<Long> list) {
         //向前插入父id
         list.addFirst(categoryEntity.getCatId());
 
@@ -111,6 +114,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             CategoryEntity parent = categoryDao.selectById(categoryEntity.getParentCid());
             getCatelogPath(parent, list);
         }
+        return list;
     }
 
 }
