@@ -1,6 +1,7 @@
 package com.fosss.gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fosss.gulimall.product.dao.AttrAttrgroupRelationDao;
 import com.fosss.gulimall.product.dao.AttrGroupDao;
 import com.fosss.gulimall.product.dao.CategoryDao;
@@ -111,6 +112,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
      * 查询属性详情
      */
     @Override
+    @Transactional
     public AttrRespVo getInfo(Long attrId) {
         //先查询标准数据
         AttrEntity attrEntity = baseMapper.selectById(attrId);
@@ -119,17 +121,49 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         BeanUtils.copyProperties(attrEntity, attrRespVo);
         //查询所属分组
         AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, attrEntity.getAttrId()));
-        attrRespVo.setAttrGroupId(attrAttrgroupRelationEntity.getAttrGroupId());
+        if (attrAttrgroupRelationEntity != null) {
+            attrRespVo.setAttrGroupId(attrAttrgroupRelationEntity.getAttrGroupId());
+        }
         //查询所属分类
         Long catelogId = attrEntity.getCatelogId();
-        CategoryEntity categoryEntity = categoryDao.selectById(catelogId);
-        LinkedList<Long> list = new LinkedList<>();
-        //查询分类完整路径
-        LinkedList<Long> catelogPath = attrGroupService.getCatelogPath(categoryEntity, list);
-        attrRespVo.setCatelogPath(catelogPath.toArray(new Long[]{}));
+        if (catelogId != null) {
+            CategoryEntity categoryEntity = categoryDao.selectById(catelogId);
+            LinkedList<Long> list = new LinkedList<>();
+            //查询分类完整路径
+            LinkedList<Long> catelogPath = attrGroupService.getCatelogPath(categoryEntity, list);
+            attrRespVo.setCatelogPath(catelogPath.toArray(new Long[]{}));
+        }
+
         return attrRespVo;
     }
 
+    /**
+     * 修改属性详情
+     */
+    @Override
+    @Transactional
+    public void updateAttr(AttrVo attr) {
+        AttrEntity attrEntity = new AttrEntity();
+        BeanUtils.copyProperties(attr, attrEntity);
+        //修改属性表
+        baseMapper.updateById(attrEntity);
+        //修改属性分组关系表
+        AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
+        BeanUtils.copyProperties(attr, relationEntity);
+        LambdaUpdateWrapper<AttrAttrgroupRelationEntity> wrapper = new LambdaUpdateWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, relationEntity.getAttrId());
+        //如果原来没有分组的话，则应该执行的操作是添加操作，否则应执行修改操作，这里需要进行分别讨论
+        //查询是否有分组
+        Integer count = attrAttrgroupRelationDao.selectCount(wrapper);
+        if (count == 0) {
+            //执行添加
+            attrAttrgroupRelationDao.insert(relationEntity);
+        } else {
+            attrAttrgroupRelationDao.update(
+                    relationEntity,
+                    wrapper
+            );
+        }
+    }
 }
 
 

@@ -26,5 +26,9 @@ public interface AttrService extends IService<AttrEntity> {
      * 查询属性详情
      */
     AttrRespVo getInfo(Long attrId);
+    /**
+     * 修改属性详情
+     */
+    void updateAttr(AttrVo attr);
 }
 

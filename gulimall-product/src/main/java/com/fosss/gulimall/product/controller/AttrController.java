@@ -6,11 +6,7 @@ import java.util.Map;
 import com.fosss.gulimall.product.vo.AttrRespVo;
 import com.fosss.gulimall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fosss.gulimall.product.entity.AttrEntity;
 import com.fosss.gulimall.product.service.AttrService;
@@ -63,11 +59,11 @@ public class AttrController {
     }
 
     /**
-     * 修改
+     * 修改属性详情
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody AttrEntity attr) {
-        attrService.updateById(attr);
+    @PostMapping("/update")
+    public R update(@RequestBody AttrVo attr) {
+        attrService.updateAttr(attr);
 
         return R.ok();
     }
