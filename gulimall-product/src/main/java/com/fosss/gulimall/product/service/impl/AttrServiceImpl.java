@@ -2,6 +2,7 @@ package com.fosss.gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.fosss.common.constant.ProductConstant;
 import com.fosss.gulimall.product.dao.AttrAttrgroupRelationDao;
 import com.fosss.gulimall.product.dao.AttrGroupDao;
 import com.fosss.gulimall.product.dao.CategoryDao;
@@ -16,13 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fosss.common.utils.PageUtils;
@@ -52,10 +51,13 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     private AttrGroupService attrGroupService;
 
     @Override
-    public PageUtils queryPage(Long catelogId, Map<String, Object> params) {
+    public PageUtils queryPage(Long catelogId, Map<String, Object> params, String type) {
+
         String key = params.get("key").toString();
         LambdaQueryWrapper<AttrEntity> wrapper = new LambdaQueryWrapper<AttrEntity>()
                 .eq(catelogId != 0, AttrEntity::getCatelogId, catelogId)
+                //需要判断是基本属性还是销售属性
+                .eq(AttrEntity::getAttrType, "base".equals(type) ? ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode() : ProductConstant.AttrEnum.ATTR_TYPE_SALE.getCode())
                 .like(!StringUtils.isEmpty(key), AttrEntity::getAttrName, key)
                 .or().like(!StringUtils.isEmpty(key), AttrEntity::getShowDesc, key)
                 .or().like(!StringUtils.isEmpty(key), AttrEntity::getAttrId, key);
@@ -75,14 +77,16 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             if (categoryEntity != null) {
                 attrRespVo.setCatelogName(categoryEntity.getName());
             }
-            //查询并设置分组名称
+            //查询并设置分组名称(基本属性才需要设置分组)
             //从分组和属性的关系表中查到分组id
-            AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, attrEntity.getAttrId()));
-            if (attrAttrgroupRelationEntity != null) {
-                //根据分组id查询分组名称
-                AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelationEntity.getAttrGroupId());
-                if (attrGroupEntity != null) {
-                    attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+            if (attrEntity.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()) {
+                AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, attrEntity.getAttrId()));
+                if (attrAttrgroupRelationEntity != null) {
+                    //根据分组id查询分组名称
+                    AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelationEntity.getAttrGroupId());
+                    if (attrGroupEntity != null) {
+                        attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+                    }
                 }
             }
             return attrRespVo;
@@ -101,11 +105,13 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrEntity attrEntity = new AttrEntity();
         BeanUtils.copyProperties(attr, attrEntity);
         baseMapper.insert(attrEntity);
-        //2.保存到属性和属性分组关系表
-        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
-        attrAttrgroupRelationEntity.setAttrId(attrEntity.getAttrId());
-        attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
-        relationService.save(attrAttrgroupRelationEntity);
+        //2.保存到属性和属性分组关系表(基本属性才需要设置分组)
+        if (attr.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()) {
+            AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+            attrAttrgroupRelationEntity.setAttrId(attrEntity.getAttrId());
+            attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
+            relationService.save(attrAttrgroupRelationEntity);
+        }
     }
 
     /**
@@ -119,10 +125,12 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         //设置返回数据
         AttrRespVo attrRespVo = new AttrRespVo();
         BeanUtils.copyProperties(attrEntity, attrRespVo);
-        //查询所属分组
-        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, attrEntity.getAttrId()));
-        if (attrAttrgroupRelationEntity != null) {
-            attrRespVo.setAttrGroupId(attrAttrgroupRelationEntity.getAttrGroupId());
+        //查询所属分组(基本属性才需要设置分组)
+        if (attrEntity.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()) {
+            AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, attrEntity.getAttrId()));
+            if (attrAttrgroupRelationEntity != null) {
+                attrRespVo.setAttrGroupId(attrAttrgroupRelationEntity.getAttrGroupId());
+            }
         }
         //查询所属分类
         Long catelogId = attrEntity.getCatelogId();
@@ -147,21 +155,23 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         BeanUtils.copyProperties(attr, attrEntity);
         //修改属性表
         baseMapper.updateById(attrEntity);
-        //修改属性分组关系表
-        AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
-        BeanUtils.copyProperties(attr, relationEntity);
-        LambdaUpdateWrapper<AttrAttrgroupRelationEntity> wrapper = new LambdaUpdateWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, relationEntity.getAttrId());
-        //如果原来没有分组的话，则应该执行的操作是添加操作，否则应执行修改操作，这里需要进行分别讨论
-        //查询是否有分组
-        Integer count = attrAttrgroupRelationDao.selectCount(wrapper);
-        if (count == 0) {
-            //执行添加
-            attrAttrgroupRelationDao.insert(relationEntity);
-        } else {
-            attrAttrgroupRelationDao.update(
-                    relationEntity,
-                    wrapper
-            );
+        //修改属性分组关系表(基本属性才需要设置分组)
+        if (attr.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()) {
+            AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
+            BeanUtils.copyProperties(attr, relationEntity);
+            LambdaUpdateWrapper<AttrAttrgroupRelationEntity> wrapper = new LambdaUpdateWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, relationEntity.getAttrId());
+            //如果原来没有分组的话，则应该执行的操作是添加操作，否则应执行修改操作，这里需要进行分别讨论
+            //查询是否有分组
+            Integer count = attrAttrgroupRelationDao.selectCount(wrapper);
+            if (count == 0) {
+                //执行添加
+                attrAttrgroupRelationDao.insert(relationEntity);
+            } else {
+                attrAttrgroupRelationDao.update(
+                        relationEntity,
+                        wrapper
+                );
+            }
         }
     }
 }
