@@ -26,4 +26,12 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
         return new PageUtils(page);
     }
 
+    /**
+     * 批量删除关联属性
+     */
+    @Override
+    public void removeRelations(AttrAttrgroupRelationEntity[] relationEntities) {
+        baseMapper.removeRelations(relationEntities);
+    }
+
 }

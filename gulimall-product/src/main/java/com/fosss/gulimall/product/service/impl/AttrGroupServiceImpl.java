@@ -1,6 +1,7 @@
 package com.fosss.gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,15 +15,13 @@ import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.service.AttrAttrgroupRelationService;
 import com.fosss.gulimall.product.service.AttrGroupService;
 import com.fosss.gulimall.product.service.AttrService;
+import com.fosss.gulimall.product.vo.AttrGroupRelationVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service("attrGroupService")
@@ -143,6 +142,24 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             list.add(attrEntity);
         });
         return list;
+    }
+
+    /**
+     * 删除分组关联的属性
+     * @param attrGroupRelationVo
+     */
+    @Override
+    public void deleteAttrRelation(AttrGroupRelationVo[] attrGroupRelationVo) {
+        //转为关联类
+        AttrAttrgroupRelationEntity[] relationEntities=new AttrAttrgroupRelationEntity[attrGroupRelationVo.length];
+        for (int i=0;i<attrGroupRelationVo.length; i++) {
+            AttrAttrgroupRelationEntity relation = new AttrAttrgroupRelationEntity();
+            relation.setAttrId(attrGroupRelationVo[i].getAttrId());
+            relation.setAttrGroupId(attrGroupRelationVo[i].getAttrGroupId());
+            relationEntities[i]=relation;
+        }
+        //进行批量删除
+        relationService.removeRelations(relationEntities);
     }
 
 }

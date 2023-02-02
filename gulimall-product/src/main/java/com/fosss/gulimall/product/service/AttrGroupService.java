@@ -5,6 +5,7 @@ import com.fosss.common.utils.PageUtils;
 import com.fosss.gulimall.product.entity.AttrEntity;
 import com.fosss.gulimall.product.entity.AttrGroupEntity;
 import com.fosss.gulimall.product.entity.CategoryEntity;
+import com.fosss.gulimall.product.vo.AttrGroupRelationVo;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,5 +40,10 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
      * 获取关联属性
      */
     List<AttrEntity> getAttrRelation(Long attrgroupId);
+    /**
+     * 删除分组关联的属性
+     * @param attrGroupRelationVo
+     */
+    void deleteAttrRelation(AttrGroupRelationVo[] attrGroupRelationVo);
 }
 

@@ -16,5 +16,8 @@ import java.util.Map;
 public interface AttrAttrgroupRelationService extends IService<AttrAttrgroupRelationEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    //批量删除关联属性
+    void removeRelations(AttrAttrgroupRelationEntity[] relationEntities);
 }
 

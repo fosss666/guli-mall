@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fosss.gulimall.product.entity.AttrEntity;
+import com.fosss.gulimall.product.vo.AttrGroupRelationVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,15 @@ import com.fosss.common.utils.R;
 public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
+
+    /**
+     * (批量)删除分组关联的属性
+     */
+    @PostMapping("/attr/relation/delete")
+    public R deleteAttrRelation(@RequestBody AttrGroupRelationVo[] attrGroupRelationVo){
+        attrGroupService.deleteAttrRelation(attrGroupRelationVo);
+        return R.ok();
+    }
 
     /**
      * 获取关联属性
