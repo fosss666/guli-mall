@@ -7,20 +7,31 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fosss.common.utils.PageUtils;
 import com.fosss.gulimall.product.dao.AttrGroupDao;
 import com.fosss.gulimall.product.dao.CategoryDao;
+import com.fosss.gulimall.product.entity.AttrAttrgroupRelationEntity;
+import com.fosss.gulimall.product.entity.AttrEntity;
 import com.fosss.gulimall.product.entity.AttrGroupEntity;
 import com.fosss.gulimall.product.entity.CategoryEntity;
+import com.fosss.gulimall.product.service.AttrAttrgroupRelationService;
 import com.fosss.gulimall.product.service.AttrGroupService;
+import com.fosss.gulimall.product.service.AttrService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Service("attrGroupService")
 public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEntity> implements AttrGroupService {
+
+    @Resource
+    private AttrAttrgroupRelationService relationService;
+    @Resource
+    private AttrService attrService;
 
     //@Override
     //public PageUtils queryPage(Map<String, Object> params) {
@@ -105,7 +116,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     /**
      * 获取分类完整路径
      */
-    public LinkedList<Long>  getCatelogPath(CategoryEntity categoryEntity, LinkedList<Long> list) {
+    public LinkedList<Long> getCatelogPath(CategoryEntity categoryEntity, LinkedList<Long> list) {
         //向前插入父id
         list.addFirst(categoryEntity.getCatId());
 
@@ -114,6 +125,23 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             CategoryEntity parent = categoryDao.selectById(categoryEntity.getParentCid());
             getCatelogPath(parent, list);
         }
+        return list;
+    }
+
+    /**
+     * 获取关联属性
+     */
+    @Override
+    public List<AttrEntity> getAttrRelation(Long attrgroupId) {
+        LambdaQueryWrapper<AttrAttrgroupRelationEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AttrAttrgroupRelationEntity::getAttrGroupId, attrgroupId);
+        List<AttrAttrgroupRelationEntity> relationEntities = relationService.list(wrapper);
+        List<AttrEntity> list = new ArrayList<>();
+        relationEntities.forEach((relation) -> {
+            Long attrId = relation.getAttrId();
+            AttrEntity attrEntity = attrService.getById(attrId);
+            list.add(attrEntity);
+        });
         return list;
     }
 

@@ -2,10 +2,12 @@ package com.fosss.gulimall.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fosss.common.utils.PageUtils;
+import com.fosss.gulimall.product.entity.AttrEntity;
 import com.fosss.gulimall.product.entity.AttrGroupEntity;
 import com.fosss.gulimall.product.entity.CategoryEntity;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,5 +35,9 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
      * 获取分类完整路径
      */
     public LinkedList<Long> getCatelogPath(CategoryEntity categoryEntity, LinkedList<Long> list);
+    /**
+     * 获取关联属性
+     */
+    List<AttrEntity> getAttrRelation(Long attrgroupId);
 }
 
