@@ -458,13 +458,13 @@ export default {
         brandId: "",
         weight: "",
         publishStatus: 0,
-        decript: [], 
-        images: [], 
+        decript: [],
+        images: [],
         bounds: {
           buyBounds: 0,
           growBounds: 0
         },
-        baseAttrs: [], 
+        baseAttrs: [],
         skus: []
       };
     },
@@ -798,10 +798,10 @@ export default {
   beforeDestroy() {
     PubSub.unsubscribe(this.catPathSub);
     PubSub.unsubscribe(this.brandIdSub);
-  }, //生命周期 - 销毁之前
-  destroyed() {}, //生命周期 - 销毁完成
+  }, //生命周期-销毁之前
+  destroyed() {}, //生命周期-销毁完成
   activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
-<style scoped>
+<style scoped>
 </style>
