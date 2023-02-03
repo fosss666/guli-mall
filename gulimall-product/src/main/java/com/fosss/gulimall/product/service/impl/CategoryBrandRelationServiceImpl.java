@@ -47,11 +47,18 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     public void saveDetails(CategoryBrandRelationEntity categoryBrandRelation) {
         Long brandId = categoryBrandRelation.getBrandId();
         Long catelogId = categoryBrandRelation.getCatelogId();
-        BrandEntity brandEntity = brandDao.selectById(brandId);
-        CategoryEntity categoryEntity = categoryDao.selectById(catelogId);
-        categoryBrandRelation.setBrandName(brandEntity.getName());
-        categoryBrandRelation.setCatelogName(categoryEntity.getName());
-        baseMapper.insert(categoryBrandRelation);
+        //防止重复关联
+        LambdaQueryWrapper<CategoryBrandRelationEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(CategoryBrandRelationEntity::getBrandId, brandId).eq(CategoryBrandRelationEntity::getCatelogId, catelogId);
+        Integer count = baseMapper.selectCount(wrapper);
+        if (count == 0) {
+            BrandEntity brandEntity = brandDao.selectById(brandId);
+            CategoryEntity categoryEntity = categoryDao.selectById(catelogId);
+            categoryBrandRelation.setBrandName(brandEntity.getName());
+            categoryBrandRelation.setCatelogName(categoryEntity.getName());
+            baseMapper.insert(categoryBrandRelation);
+        }
+
     }
 
     /**
