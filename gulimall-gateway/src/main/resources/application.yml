@@ -9,10 +9,16 @@ spring:
         server-addr: 127.0.0.1:8848
     gateway:
       routes:
-        - id: test_route
-          uri: https://www.baidu.com
+#        - id: test_route
+#          uri: https://www.baidu.com
+#          predicates:
+#            - Query=url, baidu
+        - id: member_route
+          uri: lb://gulimall-member #负载均衡到nacos的注册中心中的gulimall-member
           predicates:
-            - Query=url, baidu
+            - Path=/api/member/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
 
         - id: third_party_route
           uri: lb://gulimall-third-party #负载均衡到nacos的注册中心中的gulimall-third-party
