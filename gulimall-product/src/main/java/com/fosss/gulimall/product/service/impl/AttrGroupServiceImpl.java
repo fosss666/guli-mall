@@ -175,7 +175,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     }
 
     /**
-     * 获取该分组未关联的属性，用于新增关联
+     * 获取该分组gai未关联的属性，用于新增关联
      */
     @Override
     public PageUtils getNotRelation(Long attrgroupId, Map<String, Object> params) {
