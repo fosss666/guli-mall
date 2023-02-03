@@ -29,10 +29,19 @@ public class AttrGroupController {
     private AttrGroupService attrGroupService;
 
     /**
+     * 获取该分组未关联的属性，用于新增关联
+     */
+    @GetMapping("/{attrgroupId}/noattr/relation")
+    public R getNotRelation(@PathVariable("attrgroupId") Long attrgroupId, @RequestParam Map<String, Object> params) {
+        PageUtils page = attrGroupService.getNotRelation(attrgroupId, params);
+        return R.ok().put("page", page);
+    }
+
+    /**
      * (批量)删除分组关联的属性
      */
     @PostMapping("/attr/relation/delete")
-    public R deleteAttrRelation(@RequestBody AttrGroupRelationVo[] attrGroupRelationVo){
+    public R deleteAttrRelation(@RequestBody AttrGroupRelationVo[] attrGroupRelationVo) {
         attrGroupService.deleteAttrRelation(attrGroupRelationVo);
         return R.ok();
     }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fosss.common.constant.ProductConstant;
 import com.fosss.common.utils.PageUtils;
 import com.fosss.gulimall.product.dao.AttrGroupDao;
 import com.fosss.gulimall.product.dao.CategoryDao;
@@ -15,6 +16,7 @@ import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.service.AttrAttrgroupRelationService;
 import com.fosss.gulimall.product.service.AttrGroupService;
 import com.fosss.gulimall.product.service.AttrService;
+import com.fosss.gulimall.product.service.CategoryService;
 import com.fosss.gulimall.product.vo.AttrGroupRelationVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("attrGroupService")
@@ -31,6 +35,9 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     private AttrAttrgroupRelationService relationService;
     @Resource
     private AttrService attrService;
+    @Resource
+    private AttrGroupDao attrGroupDao;
+
 
     //@Override
     //public PageUtils queryPage(Map<String, Object> params) {
@@ -136,33 +143,88 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         wrapper.eq(AttrAttrgroupRelationEntity::getAttrGroupId, attrgroupId);
         List<AttrAttrgroupRelationEntity> relationEntities = relationService.list(wrapper);
         List<AttrEntity> list = new ArrayList<>();
-        relationEntities.forEach((relation) -> {
-            Long attrId = relation.getAttrId();
-            AttrEntity attrEntity = attrService.getById(attrId);
-            list.add(attrEntity);
-        });
+        if (relationEntities != null && relationEntities.size() > 0) {
+            relationEntities.forEach((relation) -> {
+                Long attrId = relation.getAttrId();
+                AttrEntity attrEntity = attrService.getById(attrId);
+                if (attrEntity != null) {
+                    list.add(attrEntity);
+                }
+            });
+        }
         return list;
     }
 
     /**
      * 删除分组关联的属性
+     *
      * @param attrGroupRelationVo
      */
     @Override
     public void deleteAttrRelation(AttrGroupRelationVo[] attrGroupRelationVo) {
         //转为关联类
-        AttrAttrgroupRelationEntity[] relationEntities=new AttrAttrgroupRelationEntity[attrGroupRelationVo.length];
-        for (int i=0;i<attrGroupRelationVo.length; i++) {
+        AttrAttrgroupRelationEntity[] relationEntities = new AttrAttrgroupRelationEntity[attrGroupRelationVo.length];
+        for (int i = 0; i < attrGroupRelationVo.length; i++) {
             AttrAttrgroupRelationEntity relation = new AttrAttrgroupRelationEntity();
             relation.setAttrId(attrGroupRelationVo[i].getAttrId());
             relation.setAttrGroupId(attrGroupRelationVo[i].getAttrGroupId());
-            relationEntities[i]=relation;
+            relationEntities[i] = relation;
         }
         //进行批量删除
         relationService.removeRelations(relationEntities);
     }
 
+    /**
+     * 获取该分组未关联的属性，用于新增关联
+     */
+    @Override
+    public PageUtils getNotRelation(Long attrgroupId, Map<String, Object> params) {
+        //！！！！！！！！！！！！！只能关联当前分类当前分组的未被其他分组关联过的基本属性
+        //获取分类id
+        AttrGroupEntity attrGroupEntity = baseMapper.selectById(attrgroupId);
+        Long catelogId = attrGroupEntity.getCatelogId();
+
+        //获取当前分类的所有分组已经关联过的属性id
+        List<AttrGroupEntity> attrGroupEntities = attrGroupDao.selectList(new LambdaQueryWrapper<AttrGroupEntity>().eq(AttrGroupEntity::getCatelogId, catelogId));
+        List<Long> attrGroupIds = attrGroupEntities.stream().map(AttrGroupEntity::getAttrGroupId).collect(Collectors.toList());
+        List<AttrAttrgroupRelationEntity> relationedAttrs = relationService.list(new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().in(AttrAttrgroupRelationEntity::getAttrGroupId, attrGroupIds));
+        List<Long> relationedAttrIds = relationedAttrs.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
+
+        //查询没有当前分类下被当前及其他分组关联过的基本属性
+        String key = params.get("key").toString();
+        long limit = Long.parseLong(params.get("limit").toString());
+        long page = Long.parseLong(params.get("page").toString());
+
+        IPage<AttrEntity> ipage = new Page<>(page, limit);
+
+        LambdaQueryWrapper<AttrEntity> attrWrapper = new LambdaQueryWrapper<>();
+        attrWrapper
+                .eq(AttrEntity::getAttrType, ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode())
+                .not(new Consumer<LambdaQueryWrapper<AttrEntity>>() {
+                    @Override
+                    public void accept(LambdaQueryWrapper<AttrEntity> attrEntityLambdaQueryWrapper) {
+                        attrEntityLambdaQueryWrapper.in(AttrEntity::getAttrId, relationedAttrIds);
+                    }
+                })
+                //or的位置一定要放在最后！！！！
+                .like(!StringUtils.isEmpty(key), AttrEntity::getAttrId, key)
+                .or().like(!StringUtils.isEmpty(key), AttrEntity::getAttrName, key)
+                .or().like(!StringUtils.isEmpty(key), AttrEntity::getShowDesc, key);
+        attrService.page(ipage, attrWrapper);
+
+
+        return new PageUtils(ipage);
+    }
+
 }
+
+
+
+
+
+
+
+
 
 
 
