@@ -49,5 +49,10 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
      * 获取该分组未关联的属性，用于新增关联
      */
     PageUtils getNotRelation(Long attrgroupId, Map<String, Object> params);
+    /**
+     * 添加属性与分组关联关系
+     * @param attrGroupRelationVos
+     */
+    void addRelation(List<AttrGroupRelationVo> attrGroupRelationVos);
 }
 

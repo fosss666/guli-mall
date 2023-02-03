@@ -1,7 +1,6 @@
 package com.fosss.gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,7 +15,6 @@ import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.service.AttrAttrgroupRelationService;
 import com.fosss.gulimall.product.service.AttrGroupService;
 import com.fosss.gulimall.product.service.AttrService;
-import com.fosss.gulimall.product.service.CategoryService;
 import com.fosss.gulimall.product.vo.AttrGroupRelationVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -214,6 +212,23 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
 
         return new PageUtils(ipage);
+    }
+
+    /**
+     * 添加属性与分组关联关系
+     * @param attrGroupRelationVos
+     */
+    @Override
+    public void addRelation(List<AttrGroupRelationVo> attrGroupRelationVos) {
+        for (AttrGroupRelationVo attrGroupRelationVo : attrGroupRelationVos) {
+            Long attrId = attrGroupRelationVo.getAttrId();
+            Long attrGroupId = attrGroupRelationVo.getAttrGroupId();
+            AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
+            relationEntity.setAttrId(attrId);
+            relationEntity.setAttrGroupId(attrGroupId);
+            relationService.save(relationEntity);
+        }
+
     }
 
 }

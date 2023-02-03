@@ -29,6 +29,15 @@ public class AttrGroupController {
     private AttrGroupService attrGroupService;
 
     /**
+     * 添加属性与分组关联关系
+     */
+    @PostMapping("/attr/relation")
+    public R addRelation(@RequestBody List<AttrGroupRelationVo> attrGroupRelationVos) {
+        attrGroupService.addRelation(attrGroupRelationVos);
+        return R.ok();
+    }
+
+    /**
      * 获取该分组未关联的属性，用于新增关联
      */
     @GetMapping("/{attrgroupId}/noattr/relation")
