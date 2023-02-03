@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service("categoryBrandRelationService")
@@ -100,6 +101,23 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     @Override
     public void updateDetails(Long catId, String name) {
         baseMapper.updateCategory(catId, name);
+    }
+
+    /**
+     * 查询分类关联的品牌
+     */
+    @Override
+    public List<BrandEntity> getBrandsByCid(Long catId) {
+        //查询该分类关联的品牌id
+        List<CategoryBrandRelationEntity> relationEntities = baseMapper.selectList(new LambdaUpdateWrapper<CategoryBrandRelationEntity>().eq(CategoryBrandRelationEntity::getCatelogId, catId));
+        List<Long> brandIds = relationEntities.stream().map((item) -> {
+            return item.getBrandId();
+        }).collect(Collectors.toList());
+        //获取品牌
+        List<BrandEntity> brandEntities = brandIds.stream().map((id) -> {
+            return brandDao.selectById(id);
+        }).collect(Collectors.toList());
+        return brandEntities;
     }
 
 }

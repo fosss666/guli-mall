@@ -10,13 +10,15 @@
           v-if="isAuth('product:brand:save')"
           type="primary"
           @click="addOrUpdateHandle()"
-        >新增</el-button>
+        >新增
+        </el-button>
         <el-button
           v-if="isAuth('product:brand:delete')"
           type="danger"
           @click="deleteHandle()"
           :disabled="dataListSelections.length <= 0"
-        >批量删除</el-button>
+        >批量删除
+        </el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -35,7 +37,7 @@
               style="width: 100px; height: 80px"
               :src="scope.row.logo"
           fit="fill"></el-image>-->
-          <img :src="scope.row.logo" style="width: 100px; height: 80px" />
+          <img :src="scope.row.logo" style="width: 100px; height: 80px"/>
         </template>
       </el-table-column>
       <el-table-column prop="descript" header-align="center" align="center" label="介绍"></el-table-column>
@@ -92,7 +94,8 @@
               type="text"
               size="small"
               @click="deleteCateRelationHandle(scope.row.id,scope.row.brandId)"
-            >移除</el-button>
+            >移除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -107,6 +110,7 @@
 <script>
 import AddOrUpdate from "./brand-add-or-update";
 import CategoryCascader from "../common/category-cascader";
+
 export default {
   data() {
     return {
@@ -137,13 +141,18 @@ export default {
   methods: {
     addCatelogSelect() {
       //{"brandId":1,"catelogId":2}
-      this.popCatelogSelectVisible =false;
+      this.popCatelogSelectVisible = false;
       this.$http({
         url: this.$http.adornUrl("/product/categorybrandrelation/save"),
         method: "post",
-        data: this.$http.adornData({brandId:this.brandId,catelogId:this.catelogPath[this.catelogPath.length-1]}, false)
-      }).then(({ data }) => {
+        data: this.$http.adornData({
+          brandId: this.brandId,
+          catelogId: this.catelogPath[this.catelogPath.length - 1]
+        }, false)
+      }).then(({data}) => {
+        this.catelogPath = []
         this.getCateRelation();
+
       });
     },
     deleteCateRelationHandle(id, brandId) {
@@ -151,7 +160,7 @@ export default {
         url: this.$http.adornUrl("/product/categorybrandrelation/delete"),
         method: "post",
         data: this.$http.adornData([id], false)
-      }).then(({ data }) => {
+      }).then(({data}) => {
         this.getCateRelation();
       });
     },
@@ -167,7 +176,7 @@ export default {
         params: this.$http.adornParams({
           brandId: this.brandId
         })
-      }).then(({ data }) => {
+      }).then(({data}) => {
         this.cateRelationTableData = data.data;
       });
     },
@@ -182,7 +191,7 @@ export default {
           limit: this.pageSize,
           key: this.dataForm.key
         })
-      }).then(({ data }) => {
+      }).then(({data}) => {
         if (data && data.code === 0) {
           this.dataList = data.page.list;
           this.totalPage = data.page.totalCount;
@@ -195,13 +204,13 @@ export default {
     },
     updateBrandStatus(data) {
       console.log("最新信息", data);
-      let { brandId, showStatus } = data;
+      let {brandId, showStatus} = data;
       //发送请求修改状态
       this.$http({
         url: this.$http.adornUrl("/product/brand/update/status"),
         method: "post",
-        data: this.$http.adornData({ brandId, showStatus }, false)
-      }).then(({ data }) => {
+        data: this.$http.adornData({brandId, showStatus}, false)
+      }).then(({data}) => {
         this.$message({
           type: "success",
           message: "状态更新成功"
@@ -235,8 +244,8 @@ export default {
       var ids = id
         ? [id]
         : this.dataListSelections.map(item => {
-            return item.brandId;
-          });
+          return item.brandId;
+        });
       this.$confirm(
         `确定对[id=${ids.join(",")}]进行[${id ? "删除" : "批量删除"}]操作?`,
         "提示",
@@ -250,7 +259,7 @@ export default {
           url: this.$http.adornUrl("/product/brand/delete"),
           method: "post",
           data: this.$http.adornData(ids, false)
-        }).then(({ data }) => {
+        }).then(({data}) => {
           if (data && data.code === 0) {
             this.$message({
               message: "操作成功",
