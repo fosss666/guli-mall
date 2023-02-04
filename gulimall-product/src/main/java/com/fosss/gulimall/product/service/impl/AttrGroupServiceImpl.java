@@ -16,7 +16,9 @@ import com.fosss.gulimall.product.service.AttrAttrgroupRelationService;
 import com.fosss.gulimall.product.service.AttrGroupService;
 import com.fosss.gulimall.product.service.AttrService;
 import com.fosss.gulimall.product.vo.AttrGroupRelationVo;
+import com.fosss.gulimall.product.vo.AttrGroupWithAttrsVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -198,12 +200,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         LambdaQueryWrapper<AttrEntity> attrWrapper = new LambdaQueryWrapper<>();
         attrWrapper
                 .eq(AttrEntity::getAttrType, ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode())
-                .not(new Consumer<LambdaQueryWrapper<AttrEntity>>() {
-                    @Override
-                    public void accept(LambdaQueryWrapper<AttrEntity> attrEntityLambdaQueryWrapper) {
-                        attrEntityLambdaQueryWrapper.in(AttrEntity::getAttrId, relationedAttrIds);
-                    }
-                })
+                .notIn(AttrEntity::getAttrId, relationedAttrIds)//attrEntityLambdaQueryWrapper.in(AttrEntity::getAttrId, relationedAttrIds);
                 //or的位置一定要放在最后！！！！
                 .like(!StringUtils.isEmpty(key), AttrEntity::getAttrId, key)
                 .or().like(!StringUtils.isEmpty(key), AttrEntity::getAttrName, key)
@@ -216,6 +213,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     /**
      * 添加属性与分组关联关系
+     *
      * @param attrGroupRelationVos
      */
     @Override
@@ -229,6 +227,32 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             relationService.save(relationEntity);
         }
 
+    }
+
+    /**
+     * 获取分类下所有分组及其属性
+     */
+    @Override
+    public List<AttrGroupWithAttrsVo> getGroupAndAttrByCatelogId(Long catelogId) {
+        //1.查询此分类的所有分组
+        List<AttrGroupEntity> attrGroupEntities = baseMapper.selectList(new LambdaQueryWrapper<AttrGroupEntity>().eq(AttrGroupEntity::getCatelogId, catelogId));
+        List<AttrGroupWithAttrsVo> res = new ArrayList<>();
+        //2.查询冰封转分组下所有属性
+        for (AttrGroupEntity attrGroupEntity : attrGroupEntities) {
+            AttrGroupWithAttrsVo attrGroupWithAttrsVo = new AttrGroupWithAttrsVo();
+            BeanUtils.copyProperties(attrGroupEntity, attrGroupWithAttrsVo);
+            //查询当前分组下的属性id
+            List<AttrAttrgroupRelationEntity> relationEntities = relationService.list(new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrGroupId, attrGroupEntity.getAttrGroupId()));
+            //获得当前分组下的属性
+            List<Long> attrIdList = relationEntities.stream().map((item) -> {
+                return item.getAttrId();
+            }).collect(Collectors.toList());
+            List<AttrEntity> attrList = new ArrayList<>(attrService.listByIds(attrIdList));
+            attrGroupWithAttrsVo.setAttrs(attrList);
+            //存入res
+            res.add(attrGroupWithAttrsVo);
+        }
+        return res;
     }
 
 }

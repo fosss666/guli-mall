@@ -52,7 +52,7 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
         //更新品牌表
         baseMapper.updateById(brand);
         //如果品牌的名字改变了的话就更新品牌分类关系表
-        if (StringUtils.isNotBlank(brand.getName())) {
+        if (!StringUtils.isEmpty(brand.getName())) {
             categoryBrandRelationService.updateBrand(brand.getBrandId(), brand.getName());
         }
     }

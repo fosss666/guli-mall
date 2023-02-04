@@ -10,6 +10,8 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>gulimall-third-party</module>
+        <module>gulimall-gateway</module>
         <module>gulimall-coupon</module>
         <module>gulimall-member</module>
         <module>gulimall-order</module>

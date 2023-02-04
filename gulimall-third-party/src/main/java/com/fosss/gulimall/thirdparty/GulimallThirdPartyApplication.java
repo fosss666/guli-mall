@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 
 @EnableDiscoveryClient
 @SpringBootApplication
-@ComponentScan(basePackages = "com.fosss")
 public class GulimallThirdPartyApplication {
 
     public static void main(String[] args) {

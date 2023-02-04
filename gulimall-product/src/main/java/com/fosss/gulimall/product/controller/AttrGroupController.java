@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.fosss.gulimall.product.entity.AttrEntity;
 import com.fosss.gulimall.product.vo.AttrGroupRelationVo;
+import com.fosss.gulimall.product.vo.AttrGroupWithAttrsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,15 @@ import com.fosss.common.utils.R;
 public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
+
+    /**
+     * 获取分类下所有分组及其属性
+     */
+    @GetMapping("{catelogId}/withattr")
+    public R getGroupAndAttrByCatelogId(@PathVariable("catelogId") Long catelogId) {
+        List<AttrGroupWithAttrsVo> list = attrGroupService.getGroupAndAttrByCatelogId(catelogId);
+        return R.ok().put("data", list);
+    }
 
     /**
      * 添加属性与分组关联关系

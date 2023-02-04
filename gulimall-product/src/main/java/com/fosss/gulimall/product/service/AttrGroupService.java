@@ -6,6 +6,7 @@ import com.fosss.gulimall.product.entity.AttrEntity;
 import com.fosss.gulimall.product.entity.AttrGroupEntity;
 import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.vo.AttrGroupRelationVo;
+import com.fosss.gulimall.product.vo.AttrGroupWithAttrsVo;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -54,5 +55,9 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
      * @param attrGroupRelationVos
      */
     void addRelation(List<AttrGroupRelationVo> attrGroupRelationVos);
+    /**
+     * 获取分类下所有分组及其属性
+     */
+    List<AttrGroupWithAttrsVo> getGroupAndAttrByCatelogId(Long catelogId);
 }
 
