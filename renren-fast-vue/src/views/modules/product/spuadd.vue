@@ -650,7 +650,10 @@ export default {
             limit: 500
           })
         }).then(({ data }) => {
+          console.log("data=====");
+          console.log("=====data=====",data);
           this.dataResp.saleAttrs = data.page.list;
+
           data.page.list.forEach(item => {
             this.dataResp.tempSaleAttrs.push({
               attrId: item.attrId,

@@ -137,6 +137,8 @@ export default {
           limit: 500
         })
       }).then(({ data }) => {
+        console.log("data=====")
+        console.log("=====data=====",data)
         data.page.list.forEach(item => {
           this.memberLevels["level_" + item.id] = item.name;
         });

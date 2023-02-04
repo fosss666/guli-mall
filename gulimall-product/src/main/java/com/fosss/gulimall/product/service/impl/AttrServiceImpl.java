@@ -53,7 +53,10 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     @Override
     public PageUtils queryPage(Long catelogId, Map<String, Object> params, String type) {
 
-        String key = params.get("key").toString();
+        String key =null;
+        if(params.get("key")!=null) {
+            key = params.get("key").toString();
+        }
         LambdaQueryWrapper<AttrEntity> wrapper = new LambdaQueryWrapper<AttrEntity>()
                 .eq(catelogId != 0, AttrEntity::getCatelogId, catelogId)
                 //需要判断是基本属性还是销售属性
