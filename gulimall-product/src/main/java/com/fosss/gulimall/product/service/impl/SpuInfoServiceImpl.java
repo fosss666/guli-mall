@@ -1,14 +1,19 @@
 package com.fosss.gulimall.product.service.impl;
 
+import com.fosss.gulimall.product.entity.SpuImagesEntity;
 import com.fosss.gulimall.product.entity.SpuInfoDescEntity;
+import com.fosss.gulimall.product.service.SpuImagesService;
 import com.fosss.gulimall.product.service.SpuInfoDescService;
 import com.fosss.gulimall.product.vo.SpuSaveVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -29,6 +34,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Resource
     private SpuInfoDescService spuInfoDescService;
+    @Resource
+    private SpuImagesService spuImagesService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -59,8 +66,17 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         spuInfoDescEntity.setDecript(join);
         spuInfoDescService.save(spuInfoDescEntity);
 
-
         //3.保存spu图集 pms_spu_images
+        List<String> images = spuSaveVo.getImages();
+        List<SpuImagesEntity> imageList = images.stream().map((image) -> {
+            SpuImagesEntity spuImagesEntity = new SpuImagesEntity();
+            spuImagesEntity.setSpuId(spuInfoEntity.getId());
+            spuImagesEntity.setImgUrl(image);
+            spuImagesEntity.setImgName(UUID.randomUUID().toString() + new Date());
+            return spuImagesEntity;
+        }).collect(Collectors.toList());
+        spuImagesService.saveBatch(imageList);
+
         //4.保存spu的规格参数 pms_product_attr_value
         //5.保存spu的积分信息 gulimall_sms->sms_spu_bounds
         //6.保存spu的sku信息
