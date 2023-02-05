@@ -1,11 +1,15 @@
 package com.fosss.gulimall.product.service.impl;
 
+import com.fosss.gulimall.product.entity.SpuInfoDescEntity;
+import com.fosss.gulimall.product.service.SpuInfoDescService;
 import com.fosss.gulimall.product.vo.SpuSaveVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
+import java.util.List;
 import java.util.Map;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,9 +21,14 @@ import com.fosss.gulimall.product.entity.SpuInfoEntity;
 import com.fosss.gulimall.product.service.SpuInfoService;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+
 
 @Service("spuInfoService")
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
+
+    @Resource
+    private SpuInfoDescService spuInfoDescService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -30,6 +39,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         return new PageUtils(page);
     }
+
     /**
      * 保存spu完整信息
      */
@@ -38,10 +48,18 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     public void saveSpu(SpuSaveVo spuSaveVo) {
         //1.保存spu基本信息 pms_spu_info
         SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
-        BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+        BeanUtils.copyProperties(spuSaveVo, spuInfoEntity);
         baseMapper.insert(spuInfoEntity);
 
         //2.保存spu描述图片 pms_spu_info_desc
+        List<String> descriptImages = spuSaveVo.getDecript();
+        String join = String.join(",", descriptImages);
+        SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+        spuInfoDescEntity.setSpuId(spuInfoEntity.getId());
+        spuInfoDescEntity.setDecript(join);
+        spuInfoDescService.save(spuInfoDescEntity);
+
+
         //3.保存spu图集 pms_spu_images
         //4.保存spu的规格参数 pms_product_attr_value
         //5.保存spu的积分信息 gulimall_sms->sms_spu_bounds
