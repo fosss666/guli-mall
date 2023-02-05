@@ -1,9 +1,10 @@
 package com.fosss.gulimall.product.service.impl;
 
+import com.fosss.gulimall.product.entity.ProductAttrValueEntity;
 import com.fosss.gulimall.product.entity.SpuImagesEntity;
 import com.fosss.gulimall.product.entity.SpuInfoDescEntity;
-import com.fosss.gulimall.product.service.SpuImagesService;
-import com.fosss.gulimall.product.service.SpuInfoDescService;
+import com.fosss.gulimall.product.service.*;
+import com.fosss.gulimall.product.vo.BaseAttrs;
 import com.fosss.gulimall.product.vo.SpuSaveVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,6 @@ import com.fosss.common.utils.Query;
 
 import com.fosss.gulimall.product.dao.SpuInfoDao;
 import com.fosss.gulimall.product.entity.SpuInfoEntity;
-import com.fosss.gulimall.product.service.SpuInfoService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -36,6 +36,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private SpuInfoDescService spuInfoDescService;
     @Resource
     private SpuImagesService spuImagesService;
+    @Resource
+    private ProductAttrValueService productAttrValueService;
+    @Resource
+    private AttrService attrService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -56,6 +60,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         //1.保存spu基本信息 pms_spu_info
         SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
         BeanUtils.copyProperties(spuSaveVo, spuInfoEntity);
+        spuInfoEntity.setCreateTime(new Date());
+        spuInfoEntity.setUpdateTime(new Date());
         baseMapper.insert(spuInfoEntity);
 
         //2.保存spu描述图片 pms_spu_info_desc
@@ -78,6 +84,18 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         spuImagesService.saveBatch(imageList);
 
         //4.保存spu的规格参数 pms_product_attr_value
+        List<BaseAttrs> baseAttrs = spuSaveVo.getBaseAttrs();
+        List<ProductAttrValueEntity> productAttrValueEntities = baseAttrs.stream().map((item) -> {
+            ProductAttrValueEntity productAttrValueEntity = new ProductAttrValueEntity();
+            productAttrValueEntity.setAttrId(item.getAttrId());
+            productAttrValueEntity.setAttrValue(item.getAttrValues());
+            productAttrValueEntity.setSpuId(spuInfoEntity.getId());
+            //需要从数据库中查名字
+            productAttrValueEntity.setAttrName(attrService.getById(item.getAttrId()).getAttrName());
+            return productAttrValueEntity;
+        }).collect(Collectors.toList());
+        productAttrValueService.saveBatch(productAttrValueEntities);
+
         //5.保存spu的积分信息 gulimall_sms->sms_spu_bounds
         //6.保存spu的sku信息
         //6.1保存sku的基本信息 pms_sku_info
