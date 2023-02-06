@@ -40,6 +40,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private SkuInfoService skuInfoService;
     @Resource
     private SkuSaleAttrValueService skuSaleAttrValueService;
+    @Resource
+    private SkuImagesService skuImagesService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -100,47 +102,55 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         //6.保存spu的sku信息
         List<Skus> skus = spuSaveVo.getSkus();
-        skus.forEach((sku)->{
-            //6.1保存sku的基本信息 pms_sku_info
-            SkuInfoEntity skuInfoEntity = new SkuInfoEntity();
-            skuInfoEntity.setSkuName(sku.getSkuName());
-            skuInfoEntity.setSkuTitle(sku.getSkuTitle());
-            skuInfoEntity.setPrice(sku.getPrice());
-            skuInfoEntity.setSkuSubtitle(sku.getSkuSubtitle());
-            skuInfoEntity.setBrandId(spuSaveVo.getBrandId());
-            skuInfoEntity.setCatalogId(spuSaveVo.getCatalogId());
-            skuInfoEntity.setSaleCount(0L);
-            //获取默认图片
-            String defaultImage="";
-            List<Images> skuImages = sku.getImages();
-            for (Images skuImage : skuImages) {
-                if(skuImage.getDefaultImg()==1){
-                    defaultImage = skuImage.getImgUrl();
+        if (skus != null && skus.size() > 0) {
+            skus.forEach((sku) -> {
+                //6.1保存sku的基本信息 pms_sku_info
+                SkuInfoEntity skuInfoEntity = new SkuInfoEntity();
+                skuInfoEntity.setSkuName(sku.getSkuName());
+                skuInfoEntity.setSkuTitle(sku.getSkuTitle());
+                skuInfoEntity.setPrice(sku.getPrice());
+                skuInfoEntity.setSkuSubtitle(sku.getSkuSubtitle());
+                skuInfoEntity.setBrandId(spuSaveVo.getBrandId());
+                skuInfoEntity.setCatalogId(spuSaveVo.getCatalogId());
+                skuInfoEntity.setSaleCount(0L);
+                //获取默认图片
+                String defaultImage = "";
+                List<Images> skuImages = sku.getImages();
+                for (Images skuImage : skuImages) {
+                    if (skuImage.getDefaultImg() == 1) {
+                        defaultImage = skuImage.getImgUrl();
+                    }
                 }
-            }
-            skuInfoEntity.setSkuDefaultImg(defaultImage);
-            skuInfoService.save(skuInfoEntity);
+                skuInfoEntity.setSkuDefaultImg(defaultImage);
+                skuInfoService.save(skuInfoEntity);
 
-            //6.2保存sku的销售属性 pms_sku_sale_attr_value
-            List<Attr> attrList = sku.getAttr();
-            List<SkuSaleAttrValueEntity> skuSaleAttrValueEntities = attrList.stream().map((attr) -> {
-                SkuSaleAttrValueEntity skuSaleAttrValueEntity = new SkuSaleAttrValueEntity();
-                skuSaleAttrValueEntity.setAttrId(attr.getAttrId());
-                skuSaleAttrValueEntity.setAttrName(attr.getAttrName());
-                skuSaleAttrValueEntity.setAttrValue(attr.getAttrValue());
-                return skuSaleAttrValueEntity;
-            }).collect(Collectors.toList());
-            skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
+                //6.2保存sku的销售属性 pms_sku_sale_attr_value
+                List<Attr> attrList = sku.getAttr();
+                List<SkuSaleAttrValueEntity> skuSaleAttrValueEntities = attrList.stream().map((attr) -> {
+                    SkuSaleAttrValueEntity skuSaleAttrValueEntity = new SkuSaleAttrValueEntity();
+                    skuSaleAttrValueEntity.setAttrId(attr.getAttrId());
+                    skuSaleAttrValueEntity.setAttrName(attr.getAttrName());
+                    skuSaleAttrValueEntity.setAttrValue(attr.getAttrValue());
+                    return skuSaleAttrValueEntity;
+                }).collect(Collectors.toList());
+                skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
+
+                //6.3保存sku的图片信息 pms_sku_images
+                List<SkuImagesEntity> skuImagesEntities = skuImages.stream().map((image -> {
+                    SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
+                    skuImagesEntity.setSkuId(skuInfoEntity.getSkuId());
+                    skuImagesEntity.setImgUrl(image.getImgUrl());
+                    skuImagesEntity.setDefaultImg(image.getDefaultImg());
+                    return skuImagesEntity;
+                })).collect(Collectors.toList());
+                skuImagesService.saveBatch(skuImagesEntities);
+
+            });
 
 
-
-        });
-
-
-        //6.3保存sku的图片信息 pms_sku_images
-        //6.4保存sku的优惠、满减等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_member_price
+            //6.4保存sku的优惠、满减等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_member_price
+        }
     }
-
 }
 
 
