@@ -2,10 +2,7 @@ package com.fosss.gulimall.product.service.impl;
 
 import com.fosss.gulimall.product.entity.*;
 import com.fosss.gulimall.product.service.*;
-import com.fosss.gulimall.product.vo.BaseAttrs;
-import com.fosss.gulimall.product.vo.Images;
-import com.fosss.gulimall.product.vo.Skus;
-import com.fosss.gulimall.product.vo.SpuSaveVo;
+import com.fosss.gulimall.product.vo.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +38,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private AttrService attrService;
     @Resource
     private SkuInfoService skuInfoService;
+    @Resource
+    private SkuSaleAttrValueService skuSaleAttrValueService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -122,9 +121,22 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             skuInfoEntity.setSkuDefaultImg(defaultImage);
             skuInfoService.save(skuInfoEntity);
 
+            //6.2保存sku的销售属性 pms_sku_sale_attr_value
+            List<Attr> attrList = sku.getAttr();
+            List<SkuSaleAttrValueEntity> skuSaleAttrValueEntities = attrList.stream().map((attr) -> {
+                SkuSaleAttrValueEntity skuSaleAttrValueEntity = new SkuSaleAttrValueEntity();
+                skuSaleAttrValueEntity.setAttrId(attr.getAttrId());
+                skuSaleAttrValueEntity.setAttrName(attr.getAttrName());
+                skuSaleAttrValueEntity.setAttrValue(attr.getAttrValue());
+                return skuSaleAttrValueEntity;
+            }).collect(Collectors.toList());
+            skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
+
+
+
         });
 
-        //6.2保存sku的销售属性 pms_sku_sale_attr_value
+
         //6.3保存sku的图片信息 pms_sku_images
         //6.4保存sku的优惠、满减等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_member_price
     }
