@@ -1,5 +1,7 @@
 package com.fosss.gulimall.product.service.impl;
 
+import com.fosss.common.to.MemberPrice;
+import com.fosss.common.to.SkuReductionTo;
 import com.fosss.common.to.SpuBoundTo;
 import com.fosss.common.utils.R;
 import com.fosss.gulimall.product.entity.*;
@@ -10,10 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -161,7 +160,21 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 skuImagesService.saveBatch(skuImagesEntities);
 
                 //6.4保存sku的优惠、满减等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_member_price
-
+                SkuReductionTo skuReductionTo = new SkuReductionTo();
+                skuReductionTo.setSkuId(skuInfoEntity.getSkuId());
+                skuReductionTo.setCountStatus(sku.getCountStatus());
+                skuReductionTo.setDiscount(sku.getDiscount());
+                skuReductionTo.setFullCount(sku.getFullCount());
+                skuReductionTo.setReducePrice(sku.getReducePrice());
+                skuReductionTo.setFullPrice(sku.getFullPrice());
+                skuReductionTo.setPriceStatus(sku.getPriceStatus());
+                List<MemberPrice> memberPrice = new ArrayList<>();
+                BeanUtils.copyProperties(sku.getMemberPrice(), memberPrice);
+                skuReductionTo.setMemberPrice(memberPrice);
+                R r1 = couponFeignService.saveReduction(skuReductionTo);
+                if (r1.getCode() != 0) {
+                    log.error("远程保存优惠满减失败");
+                }
             });
 
 

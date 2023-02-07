@@ -1,5 +1,6 @@
 package com.fosss.gulimall.product.feign;
 
+import com.fosss.common.to.SkuReductionTo;
 import com.fosss.common.to.SpuBoundTo;
 import com.fosss.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,6 +17,10 @@ public interface CouponFeignService {
     //保存积分信息
     @PostMapping("/coupon/spubounds/save")
     R save(@RequestBody SpuBoundTo spuBoundTo);
+
+    //保存优惠满减等信息
+    @PostMapping("/saveReduction")
+    R saveReduction(@RequestBody SkuReductionTo skuReductionTo);
 }
 
 
