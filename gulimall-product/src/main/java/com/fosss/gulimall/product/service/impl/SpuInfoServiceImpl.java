@@ -1,6 +1,9 @@
 package com.fosss.gulimall.product.service.impl;
 
+import com.fosss.common.to.SpuBoundTo;
+import com.fosss.common.utils.R;
 import com.fosss.gulimall.product.entity.*;
+import com.fosss.gulimall.product.feign.CouponFeignService;
 import com.fosss.gulimall.product.service.*;
 import com.fosss.gulimall.product.vo.*;
 import org.springframework.beans.BeanUtils;
@@ -42,6 +45,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private SkuSaleAttrValueService skuSaleAttrValueService;
     @Resource
     private SkuImagesService skuImagesService;
+    @Resource
+    private CouponFeignService couponFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -98,7 +103,17 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         }).collect(Collectors.toList());
         productAttrValueService.saveBatch(productAttrValueEntities);
 
-        //TODO 5.保存spu的积分信息 gulimall_sms->sms_spu_bounds
+        //5.保存spu的积分信息 gulimall_sms->sms_spu_bounds
+        //远程调用gulimall-coupon中的保存方法
+        Bounds bounds = spuSaveVo.getBounds();
+        SpuBoundTo spuBoundTo = new SpuBoundTo();
+        spuBoundTo.setSpuId(spuInfoEntity.getId());
+        spuBoundTo.setBuyBounds(bounds.getBuyBounds());
+        spuBoundTo.setGrowBounds(bounds.getGrowBounds());
+        R r = couponFeignService.save(spuBoundTo);
+        if (r.getCode() != 0) {
+            log.error("远程调用方法保存spu积分信息失败");
+        }
 
         //6.保存spu的sku信息
         List<Skus> skus = spuSaveVo.getSkus();
@@ -145,10 +160,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 })).collect(Collectors.toList());
                 skuImagesService.saveBatch(skuImagesEntities);
 
+                //6.4保存sku的优惠、满减等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_member_price
+
             });
 
 
-            //6.4保存sku的优惠、满减等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_member_price
         }
     }
 }
