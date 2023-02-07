@@ -19,7 +19,7 @@ public interface CouponFeignService {
     R save(@RequestBody SpuBoundTo spuBoundTo);
 
     //保存优惠满减等信息
-    @PostMapping("/saveReduction")
+    @PostMapping("/coupon/skufullreduction/saveReduction")
     R saveReduction(@RequestBody SkuReductionTo skuReductionTo);
 }
 

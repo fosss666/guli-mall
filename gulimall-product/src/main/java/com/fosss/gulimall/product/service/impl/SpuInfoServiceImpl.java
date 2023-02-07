@@ -120,6 +120,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             skus.forEach((sku) -> {
                 //6.1保存sku的基本信息 pms_sku_info
                 SkuInfoEntity skuInfoEntity = new SkuInfoEntity();
+                skuInfoEntity.setSpuId(spuInfoEntity.getId());
                 skuInfoEntity.setSkuName(sku.getSkuName());
                 skuInfoEntity.setSkuTitle(sku.getSkuTitle());
                 skuInfoEntity.setPrice(sku.getPrice());
@@ -150,13 +151,17 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
 
                 //6.3保存sku的图片信息 pms_sku_images
-                List<SkuImagesEntity> skuImagesEntities = skuImages.stream().map((image -> {
-                    SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
-                    skuImagesEntity.setSkuId(skuInfoEntity.getSkuId());
-                    skuImagesEntity.setImgUrl(image.getImgUrl());
-                    skuImagesEntity.setDefaultImg(image.getDefaultImg());
-                    return skuImagesEntity;
-                })).collect(Collectors.toList());
+                List<SkuImagesEntity> skuImagesEntities = skuImages.stream()
+                        .filter(item -> {//过滤掉没有url的数据
+                            return item.getImgUrl() != null && item.getImgUrl().length() > 0;
+                        })
+                        .map((image -> {
+                            SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
+                            skuImagesEntity.setSkuId(skuInfoEntity.getSkuId());
+                            skuImagesEntity.setImgUrl(image.getImgUrl());
+                            skuImagesEntity.setDefaultImg(image.getDefaultImg());
+                            return skuImagesEntity;
+                        })).collect(Collectors.toList());
                 skuImagesService.saveBatch(skuImagesEntities);
 
                 //6.4保存sku的优惠、满减等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_member_price
