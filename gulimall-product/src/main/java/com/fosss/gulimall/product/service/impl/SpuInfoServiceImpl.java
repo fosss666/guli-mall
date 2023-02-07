@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -109,11 +110,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         spuBoundTo.setSpuId(spuInfoEntity.getId());
         spuBoundTo.setBuyBounds(bounds.getBuyBounds());
         spuBoundTo.setGrowBounds(bounds.getGrowBounds());
-        R r = couponFeignService.save(spuBoundTo);
-        if (r.getCode() != 0) {
-            log.error("远程调用方法保存spu积分信息失败");
+        if (bounds.getBuyBounds().compareTo(new BigDecimal(0)) > 0 && bounds.getGrowBounds().compareTo(new BigDecimal(0)) > 0) {
+            R r = couponFeignService.save(spuBoundTo);
+            if (r.getCode() != 0) {
+                log.error("远程调用方法保存spu积分信息失败");
+            }
         }
-
         //6.保存spu的sku信息
         List<Skus> skus = spuSaveVo.getSkus();
         if (skus != null && skus.size() > 0) {

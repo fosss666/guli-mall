@@ -8,6 +8,7 @@ import com.fosss.gulimall.coupon.service.MemberPriceService;
 import com.fosss.gulimall.coupon.service.SkuLadderService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -56,7 +57,9 @@ public class SkuFullReductionServiceImpl extends ServiceImpl<SkuFullReductionDao
         skuLadderEntity.setDiscount(skuReductionTo.getDiscount());
         skuLadderEntity.setFullCount(skuReductionTo.getFullCount());
         skuLadderEntity.setAddOther(skuReductionTo.getCountStatus());
-        skuLadderService.save(skuLadderEntity);
+        if (skuReductionTo.getDiscount().compareTo(new BigDecimal(0)) > 0 && skuReductionTo.getFullCount() > 0) {
+            skuLadderService.save(skuLadderEntity);
+        }
 
         //sms_sku_full_reduction
         SkuFullReductionEntity skuFullReductionEntity = new SkuFullReductionEntity();
@@ -64,7 +67,9 @@ public class SkuFullReductionServiceImpl extends ServiceImpl<SkuFullReductionDao
         skuFullReductionEntity.setFullPrice(skuReductionTo.getFullPrice());
         skuFullReductionEntity.setAddOther(skuReductionTo.getCountStatus());
         skuFullReductionEntity.setReducePrice(skuReductionTo.getReducePrice());
-        baseMapper.insert(skuFullReductionEntity);
+        if (skuReductionTo.getFullPrice().compareTo(new BigDecimal(0)) > 0 && skuReductionTo.getReducePrice().compareTo(new BigDecimal(0)) > 0) {
+            baseMapper.insert(skuFullReductionEntity);
+        }
 
         //sms_member_price
         List<MemberPrice> memberPrice = skuReductionTo.getMemberPrice();
@@ -76,7 +81,9 @@ public class SkuFullReductionServiceImpl extends ServiceImpl<SkuFullReductionDao
             memberPriceEntity.setMemberLevelName(item.getName());
             memberPriceEntity.setAddOther(1);
             return memberPriceEntity;
-        })).collect(Collectors.toList());
+        })).filter((item) -> {
+            return item.getMemberPrice().compareTo(new BigDecimal(0)) > 0;
+        }).collect(Collectors.toList());
         memberPriceService.saveBatch(memberPriceEntityList);
 
     }
