@@ -32,11 +32,11 @@ public class SpuInfoController {
     private SpuInfoService spuInfoService;
 
     /**
-     * 列表
+     * spu检索
      */
     @RequestMapping("/list")
         public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = spuInfoService.queryPage(params);
+        PageUtils page = spuInfoService.listByConditions(params);
 
         return R.ok().put("page", page);
     }

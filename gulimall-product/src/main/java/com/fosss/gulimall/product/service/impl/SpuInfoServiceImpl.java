@@ -1,5 +1,8 @@
 package com.fosss.gulimall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.additional.query.impl.LambdaQueryChainWrapper;
 import com.fosss.common.to.MemberPrice;
 import com.fosss.common.to.SkuReductionTo;
 import com.fosss.common.to.SpuBoundTo;
@@ -24,6 +27,7 @@ import com.fosss.common.utils.Query;
 
 import com.fosss.gulimall.product.dao.SpuInfoDao;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 
@@ -186,6 +190,33 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
 
         }
+    }
+
+    /**
+     * spu检索
+     */
+    @Override
+    public PageUtils listByConditions(Map<String, Object> params) {
+        long page = Long.parseLong(params.get("page") + "");
+        long limit = Long.parseLong(params.get("limit") + "");
+        String key = (String) params.get("key");
+        String catelogId = (String) params.get("catelogId");
+        String brandId = (String) params.get("brandId");
+        String status = (String) params.get("status");
+
+        IPage<SpuInfoEntity> iPage = new Page<>(page, limit);
+
+        LambdaQueryWrapper<SpuInfoEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper
+                .eq(!StringUtils.isEmpty(catelogId) && !"0".equals(catelogId), SpuInfoEntity::getCatalogId, catelogId)
+                .eq(!StringUtils.isEmpty(brandId) && !"0".equals(brandId), SpuInfoEntity::getBrandId, brandId)
+                .eq(!StringUtils.isEmpty(status), SpuInfoEntity::getPublishStatus, status)
+                .like(!StringUtils.isEmpty(key), SpuInfoEntity::getId, key)
+                .or().like(!StringUtils.isEmpty(key), SpuInfoEntity::getSpuName, key)
+                .or().like(!StringUtils.isEmpty(key), SpuInfoEntity::getSpuDescription, key);
+
+        baseMapper.selectPage(iPage, wrapper);
+        return new PageUtils(iPage);
     }
 }
 
