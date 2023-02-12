@@ -132,7 +132,7 @@ export default {
     //处理更多指令
     handleCommand(row, command) {
       console.log("~~~~~", row, command);
-      if ("stockSettings" == command) {
+      if ("stockSettings" === command) {
         this.$router.push({ path: "/ware-sku", query: { skuId: row.skuId } });
       }
     },
@@ -192,6 +192,6 @@ export default {
   beforeDestroy() {
     PubSub.unsubscribe(this.catPathSub);
     PubSub.unsubscribe(this.brandIdSub);
-  } //生命周期 - 销毁之前
+  } //生命周期-销毁之前
 };
 </script>

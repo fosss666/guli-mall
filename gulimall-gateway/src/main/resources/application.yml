@@ -13,6 +13,13 @@ spring:
 #          uri: https://www.baidu.com
 #          predicates:
 #            - Query=url, baidu
+        - id: ware_route
+          uri: lb://gulimall-ware #负载均衡到nacos的注册中心中的gulimall-ware
+          predicates:
+            - Path=/api/ware/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
+
         - id: member_route
           uri: lb://gulimall-member #负载均衡到nacos的注册中心中的gulimall-member
           predicates:
