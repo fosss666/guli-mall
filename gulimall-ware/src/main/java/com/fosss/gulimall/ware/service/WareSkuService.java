@@ -14,7 +14,9 @@ import java.util.Map;
  * @date 2023-01-13 16:38:38
  */
 public interface WareSkuService extends IService<WareSkuEntity> {
-
+    /**
+     * 查询商品库存
+     */
     PageUtils queryPage(Map<String, Object> params);
 }
 
