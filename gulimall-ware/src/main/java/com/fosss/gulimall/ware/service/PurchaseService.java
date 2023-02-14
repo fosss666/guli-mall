@@ -24,5 +24,9 @@ public interface PurchaseService extends IService<PurchaseEntity> {
      * @param mergeVo
      */
     void merge(MergeVo mergeVo);
+    /**
+     * 查询采购单
+     */
+    PageUtils list(Map<String, Object> params);
 }
 

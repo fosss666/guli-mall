@@ -36,10 +36,19 @@ public class PurchaseController {
     }
 
     /**
-     * 查询未领取的采购单
+     * 查询采购单
+     */
+    @GetMapping("/list")
+    public R list(@RequestParam Map<String, Object> params) {
+        PageUtils page = purchaseService.list(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 合并采购需求
      */
     @RequestMapping("/unreceive/list")
-    public R list(@RequestParam Map<String, Object> params) {
+    public R queryPage(@RequestParam Map<String, Object> params) {
         PageUtils page = purchaseService.queryPage(params);
 
         return R.ok().put("page", page);
