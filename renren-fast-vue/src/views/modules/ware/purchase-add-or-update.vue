@@ -120,6 +120,8 @@
                     this.$emit('refreshDataList')
                   }
                 })
+                //清空表单
+                this.dataForm=[]
               } else {
                 this.$message.error(data.msg)
               }

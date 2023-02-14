@@ -124,7 +124,7 @@ export default {
     this.getDataList();
   },
   created() {
-    
+
   },
   methods: {
     opendrawer(row){
@@ -136,7 +136,7 @@ export default {
       let _this = this;
       let user = {};
       this.userList.forEach(item=>{
-        if(item.userId == _this.userId){
+        if(item.userId === _this.userId){
             user = item;
         }
       });
@@ -160,7 +160,7 @@ export default {
             type: "success",
             duration: 1500
           });
-          
+
           this.userId = "";
           this.getDataList();
         } else {
