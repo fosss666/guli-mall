@@ -31,7 +31,10 @@ public class PurchaseDetailController {
     private PurchaseDetailService purchaseDetailService;
 
     /**
-     * 列表
+     * 查询采购需求
+     *    key: '华为',//检索关键字
+     *    status: 0,//状态
+     *    wareId: 1,//仓库id
      */
     @RequestMapping("/list")
         public R list(@RequestParam Map<String, Object> params){
