@@ -5,6 +5,7 @@ import com.fosss.common.utils.PageUtils;
 import com.fosss.gulimall.ware.entity.PurchaseEntity;
 import com.fosss.gulimall.ware.vo.MergeVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,5 +29,10 @@ public interface PurchaseService extends IService<PurchaseEntity> {
      * 查询采购单
      */
     PageUtils list(Map<String, Object> params);
+    /**
+     * 领取采购单
+     * @param purchaseIds 采购单id
+     */
+    void received(List<Long> purchaseIds);
 }
 

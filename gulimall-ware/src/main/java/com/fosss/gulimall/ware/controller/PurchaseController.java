@@ -2,6 +2,7 @@ package com.fosss.gulimall.ware.controller;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import com.fosss.gulimall.ware.vo.MergeVo;
@@ -26,6 +27,16 @@ import com.fosss.common.utils.R;
 public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
+
+    /**
+     * 领取采购单
+     * @param purchaseIds 采购单id
+     */
+    @PostMapping("/received")
+    public R received(@RequestBody List<Long> purchaseIds){
+        purchaseService.received(purchaseIds);
+        return R.ok();
+    }
 
     /**
      * 合并采购需求
