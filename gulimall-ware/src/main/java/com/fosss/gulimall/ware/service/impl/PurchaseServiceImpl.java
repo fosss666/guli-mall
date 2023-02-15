@@ -71,27 +71,31 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
             purchaseId = purchaseEntity.getId();
         }
 
-        //TODO 确认采购单状态是0,1才可以合并
+        // 确认采购单状态是0,1才可以合并
+        //查询采购单状态
+        PurchaseEntity purchase = baseMapper.selectById(purchaseId);
+        if(purchase.getStatus()==WareConstant.PurchaseStatusEnum.CREATED.getCode()||purchase.getStatus()==WareConstant.PurchaseStatusEnum.ASSIGNED.getCode()){
+            //获取要合并的采购需求
+            List<Long> items = mergeVo.getItems();
+            Long finalPurchaseId = purchaseId;
+            List<PurchaseDetailEntity> collect = items.stream().map(id -> {
+                PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+                purchaseDetailEntity.setId(id);
+                purchaseDetailEntity.setStatus(WareConstant.PurchaseDetailStatusEnum.ASSIGNED.getCode());
+                //Variable used in lambda expression should be final or effectively final
+                //lambda表达式中使用的变量应该是final或者有效的final，也就是说，lambda 表达式只能引用标记了 final 的外层局部变量，这就是说不能在 lambda 内部修改定义在域外的局部变量，否则会编译错误
+                //在lambda表达式中对变量的操作都是基于原变量的副本，不会影响到原变量的值。
+                purchaseDetailEntity.setPurchaseId(finalPurchaseId);
+                return purchaseDetailEntity;
+            }).collect(Collectors.toList());
+            //修改采购详情（合并需求）
+            purchaseDetailService.updateBatchById(collect);
+            //更新采购时间
+            PurchaseEntity purchaseEntity = baseMapper.selectById(purchaseId);
+            purchaseEntity.setUpdateTime(new Date());
+            baseMapper.updateById(purchaseEntity);
+        }
 
-        //获取要合并的采购需求
-        List<Long> items = mergeVo.getItems();
-        Long finalPurchaseId = purchaseId;
-        List<PurchaseDetailEntity> collect = items.stream().map(id -> {
-            PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
-            purchaseDetailEntity.setId(id);
-            purchaseDetailEntity.setStatus(WareConstant.PurchaseDetailStatusEnum.ASSIGNED.getCode());
-            //Variable used in lambda expression should be final or effectively final
-            //lambda表达式中使用的变量应该是final或者有效的final，也就是说，lambda 表达式只能引用标记了 final 的外层局部变量，这就是说不能在 lambda 内部修改定义在域外的局部变量，否则会编译错误
-            //在lambda表达式中对变量的操作都是基于原变量的副本，不会影响到原变量的值。
-            purchaseDetailEntity.setPurchaseId(finalPurchaseId);
-            return purchaseDetailEntity;
-        }).collect(Collectors.toList());
-        //修改采购详情（合并需求）
-        purchaseDetailService.updateBatchById(collect);
-        //更新采购时间
-        PurchaseEntity purchaseEntity = baseMapper.selectById(purchaseId);
-        purchaseEntity.setUpdateTime(new Date());
-        baseMapper.updateById(purchaseEntity);
     }
 
     /**

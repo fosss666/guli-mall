@@ -1,6 +1,7 @@
 package com.fosss.gulimall.ware.controller;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 import com.fosss.gulimall.ware.vo.MergeVo;
@@ -70,6 +71,8 @@ public class PurchaseController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody PurchaseEntity purchase) {
+        purchase.setCreateTime(new Date());
+        purchase.setUpdateTime(new Date());
         purchaseService.save(purchase);
 
         return R.ok();
