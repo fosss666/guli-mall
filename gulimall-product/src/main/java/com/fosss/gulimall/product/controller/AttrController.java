@@ -35,6 +35,14 @@ public class AttrController {
     @Resource
     private ProductAttrValueService productAttrValueService;
 
+    /**
+     * 更新spu规格
+     */
+    @PostMapping("/update/{spuId}")
+    public R updateSpuAttrValue(@PathVariable("spuId") Long spuId, @RequestBody List<ProductAttrValueEntity> productAttrValueEntities) {
+        productAttrValueService.updateSpuAttrValue(spuId, productAttrValueEntities);
+        return R.ok();
+    }
 
     /**
      * 获取spu规格
