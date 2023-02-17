@@ -1,8 +1,11 @@
 package com.fosss.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.fosss.gulimall.product.entity.ProductAttrValueEntity;
+import com.fosss.gulimall.product.service.ProductAttrValueService;
 import com.fosss.gulimall.product.vo.AttrRespVo;
 import com.fosss.gulimall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,8 @@ import com.fosss.gulimall.product.entity.AttrEntity;
 import com.fosss.gulimall.product.service.AttrService;
 import com.fosss.common.utils.PageUtils;
 import com.fosss.common.utils.R;
+
+import javax.annotation.Resource;
 
 
 /**
@@ -26,6 +31,19 @@ import com.fosss.common.utils.R;
 public class AttrController {
     @Autowired
     private AttrService attrService;
+
+    @Resource
+    private ProductAttrValueService productAttrValueService;
+
+
+    /**
+     * 获取spu规格
+     */
+    @GetMapping("/base/listforspu/{spuId}")
+    public R getSpuAttrValue(@PathVariable("spuId") Long spuId) {
+        List<ProductAttrValueEntity> data = productAttrValueService.getSpuAttrValue(spuId);
+        return R.ok().put("data", data);
+    }
 
     /**
      * 列表
