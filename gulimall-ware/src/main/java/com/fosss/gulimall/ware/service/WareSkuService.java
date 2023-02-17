@@ -18,5 +18,12 @@ public interface WareSkuService extends IService<WareSkuEntity> {
      * 查询商品库存
      */
     PageUtils queryPage(Map<String, Object> params);
+    /**
+     * 添加库存
+     * @param skuId skuId
+     * @param wareId 仓库id
+     * @param skuNum 当前库存
+     */
+    void addStock(Long skuId, Long wareId, Integer skuNum);
 }
 

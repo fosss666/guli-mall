@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.fosss.common.utils.PageUtils;
 import com.fosss.gulimall.ware.entity.PurchaseEntity;
 import com.fosss.gulimall.ware.vo.MergeVo;
+import com.fosss.gulimall.ware.vo.PurchaseDoneVo;
 
 import java.util.List;
 import java.util.Map;
@@ -34,5 +35,9 @@ public interface PurchaseService extends IService<PurchaseEntity> {
      * @param purchaseIds 采购单id
      */
     void received(List<Long> purchaseIds);
+    /**
+     * 完成采购功能
+     */
+    void donePurchase(PurchaseDoneVo purchaseDoneVo);
 }
 

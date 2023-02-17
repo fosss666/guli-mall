@@ -21,5 +21,20 @@ public interface PurchaseDetailService extends IService<PurchaseDetailEntity> {
      *    wareId: 1,//仓库id
      */
     PageUtils queryPage(Map<String, Object> params);
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

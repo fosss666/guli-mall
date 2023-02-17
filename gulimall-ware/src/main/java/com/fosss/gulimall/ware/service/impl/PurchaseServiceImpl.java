@@ -6,9 +6,13 @@ import com.fosss.common.constant.WareConstant;
 import com.fosss.gulimall.ware.controller.WareInfoController;
 import com.fosss.gulimall.ware.entity.PurchaseDetailEntity;
 import com.fosss.gulimall.ware.service.PurchaseDetailService;
+import com.fosss.gulimall.ware.service.WareSkuService;
 import com.fosss.gulimall.ware.vo.MergeVo;
+import com.fosss.gulimall.ware.vo.PurchaseDoneVo;
+import com.fosss.gulimall.ware.vo.PurchaseItemDoneVo;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +37,8 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
 
     @Resource
     private PurchaseDetailService purchaseDetailService;
+    @Resource
+    private WareSkuService wareSkuService;
 
     /**
      * 查询未领取的采购单
@@ -145,6 +151,55 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
             purchaseDetailService.updateBatchById(purchaseDetailEntities);
         }
 
+    }
+
+    /**
+     * 完成采购功能
+     */
+    @Transactional
+    @Override
+    public void donePurchase(PurchaseDoneVo purchaseDoneVo) {
+        //修改采购需求的状态（可能采购成功，可能采购不成功）
+        Long purchaseId = purchaseDoneVo.getId();
+        List<PurchaseItemDoneVo> items = purchaseDoneVo.getItems();
+        //要修改的采购需求集合
+        List<PurchaseDetailEntity> list = new ArrayList<>();
+        //设置采购是否全部成功的标识
+        boolean flag = true;
+
+        for (PurchaseItemDoneVo item : items) {
+            PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+            Integer status = item.getStatus();
+            //这是个修改操作哦，只添加主键和要修改的值即可
+            purchaseDetailEntity.setStatus(status);
+            purchaseDetailEntity.setId(item.getItemId());
+            //根据采购是否成功决定是否修改库存
+            if (status == WareConstant.PurchaseDetailStatusEnum.HASERROR.getCode()) {
+                flag = false;
+            } else {
+                //采购成功，修改或添加成功的采购需求的库存
+                //查询采购需求的仓库id,库存
+                PurchaseDetailEntity detailEntity = purchaseDetailService.getById(item.getItemId());
+                wareSkuService.addStock(detailEntity.getSkuId(), detailEntity.getWareId(), detailEntity.getSkuNum());
+            }
+
+            list.add(purchaseDetailEntity);
+        }
+        //修改订单需求
+        purchaseDetailService.updateBatchById(list);
+
+        //修改采购单状态，如果采购需求出现一个不成功的情况，采购单的状态就为不成功
+        PurchaseEntity purchaseEntity = new PurchaseEntity();
+        if (flag) {
+            purchaseEntity.setStatus(WareConstant.PurchaseStatusEnum.FINISH.getCode());
+        } else {
+            //有需求没有完成
+            purchaseEntity.setStatus(WareConstant.PurchaseStatusEnum.HASERROR.getCode());
+        }
+        purchaseEntity.setId(purchaseId);
+        purchaseEntity.setUpdateTime(new Date());
+        //更新采购单
+        baseMapper.updateById(purchaseEntity);
     }
 }
 

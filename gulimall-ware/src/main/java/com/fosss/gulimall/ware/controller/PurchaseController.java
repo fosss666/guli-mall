@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fosss.gulimall.ware.vo.MergeVo;
+import com.fosss.gulimall.ware.vo.PurchaseDoneVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +30,18 @@ public class PurchaseController {
     private PurchaseService purchaseService;
 
     /**
+     * 完成采购功能
+     */
+    @PostMapping("/done")
+    public R donePurchase(@RequestBody PurchaseDoneVo purchaseDoneVo){
+        purchaseService.donePurchase(purchaseDoneVo);
+        return R.ok();
+    }
+
+    /**
      * 领取采购单
      * @param purchaseIds 采购单id
+     * postman模拟发送http://localhost:88/api/ware/purchase/received
      */
     @PostMapping("/received")
     public R received(@RequestBody List<Long> purchaseIds){

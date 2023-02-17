@@ -52,7 +52,7 @@ public class SkuInfoController {
     }
 
     /**
-     * 保存
+     * 保存,被gulimall-ware远程调用
      */
     @RequestMapping("/save")
         public R save(@RequestBody SkuInfoEntity skuInfo){
