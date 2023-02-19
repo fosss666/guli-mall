@@ -1,0 +1,18 @@
+#post带_update("doc")的更新会检查和原来数据是否相同，如果相同的话就不会更新version,seq_no
+POST http://192.168.113.128:9200/customer/external/1/_update
+Content-Type: application/json
+
+{
+  "doc": {
+    "name": "daming"
+  }
+}
+
+
+###put和post不带_update("doc")的更新就会直接更新，并更新version,seq_no
+PUT http://192.168.113.128:9200/customer/external/1
+Content-Type: application/json
+
+{
+  "name": "xiaoming"
+}
