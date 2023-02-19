@@ -1,0 +1,15 @@
+###查询1号数据
+GET http://192.168.113.128:9200/customer/external/1
+
+###乐观锁字段 "_seq_no": 1, //并发控制字段，每次更新就会+1，用来做乐观锁 "_primary_term": 1, //同上，主分片重新分配，如重启，就会变化
+PUT http://192.168.113.128:9200/customer/external/1?if_seq_no=6&if_primary_term=1
+Content-Type: application/json
+
+{
+  "name": "zhangsan2"
+}
+
+
+
+
+
