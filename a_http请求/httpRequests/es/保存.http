@@ -1,0 +1,17 @@
+#post带id或不带保存，id存在则进行更新
+POST http://192.168.113.128:9200/customer/external
+Content-Type: application/json
+
+{
+  "data": "null"
+}
+
+### 三个井号的作用是隔离请求
+
+#put带id保存，id存在则进行更新
+PUT http://192.168.113.128:9200/customer/external/1
+Content-Type: application/json
+
+{
+  "name": "zhangsan"
+}
