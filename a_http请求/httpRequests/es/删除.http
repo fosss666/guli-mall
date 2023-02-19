@@ -1,0 +1,5 @@
+###根据id删除
+DELETE http://192.168.113.128:9200/customer/external/1
+
+###根据索引删除
+DELETE http://192.168.113.128:9200/customer
