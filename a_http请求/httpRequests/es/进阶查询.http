@@ -60,6 +60,18 @@ Content-Type: application/json
   }
 }
 
+### multi_match 多字段匹配
+GET http://192.168.113.128:9200/bank/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "multi_match": {
+      "query": "mill",
+      "fields": ["state","address"]
+    }
+  }
+}
 
 
 
