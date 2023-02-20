@@ -73,6 +73,32 @@ Content-Type: application/json
   }
 }
 
+### bool复合查询
+GET http://192.168.113.128:9200/bank/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": [{
+        "match": {
+          "address": "mill"
+        }
+      }],
+      "must_not": [{
+        "match": {
+          "age": 18
+        }
+      }],
+      "should": [{
+        "match": {
+          "lastname": "wallence"
+        }
+      }]
+    }
+  }
+}
+
 
 
 
