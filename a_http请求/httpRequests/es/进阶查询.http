@@ -1,0 +1,64 @@
+###检索所有，并按照account_number升序排列
+GET http://192.168.113.128:9200/bank/_search?q=*&sort=account_number:asc
+
+###
+GET http://192.168.113.128:9200/bank/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  },
+  "sort": [
+    {
+      "account_number": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+
+### QueryDSL基本使用
+GET http://192.168.113.128:9200/bank/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  },
+  "sort": {
+    "balance": {
+      "order": "desc"
+    }
+  },
+  "from": 0,
+  "size": 2,
+  "_source": ["balance","age"]
+}
+
+### match全文检索-按照评分排序，对检索条件分词匹配
+GET http://192.168.113.128:9200/bank/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "account_number": 20
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
