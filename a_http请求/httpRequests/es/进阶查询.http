@@ -33,7 +33,10 @@ Content-Type: application/json
   },
   "from": 0,
   "size": 2,
-  "_source": ["balance","age"]
+  "_source": [
+    "balance",
+    "age"
+  ]
 }
 
 ### match全文检索-按照评分排序，对检索条件分词匹配
@@ -68,7 +71,10 @@ Content-Type: application/json
   "query": {
     "multi_match": {
       "query": "mill",
-      "fields": ["state","address"]
+      "fields": [
+        "state",
+        "address"
+      ]
     }
   }
 }
@@ -80,25 +86,70 @@ Content-Type: application/json
 {
   "query": {
     "bool": {
-      "must": [{
-        "match": {
-          "address": "mill"
+      "must": [
+        {
+          "match": {
+            "address": "mill"
+          }
         }
-      }],
-      "must_not": [{
-        "match": {
-          "age": 18
+      ],
+      "must_not": [
+        {
+          "match": {
+            "age": 18
+          }
         }
-      }],
-      "should": [{
-        "match": {
-          "lastname": "wallence"
+      ],
+      "should": [
+        {
+          "match": {
+            "lastname": "wallence"
+          }
         }
-      }]
+      ]
     }
   }
 }
 
+### filter过滤
+GET http://192.168.113.128:9200/bank/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "address": "mill"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "match": {
+            "age": 18
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "lastname": "wallence"
+          }
+        }
+      ],
+      "filter": {
+        "range": {
+          "age": {
+            "gte": 10,
+            "lte": 30
+          }
+        }
+      }
+    }
+  }
+}
 
 
 
