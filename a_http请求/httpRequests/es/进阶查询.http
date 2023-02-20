@@ -151,7 +151,17 @@ Content-Type: application/json
   }
 }
 
+### 文本用match检索，精确的如年龄用term
+GET http://192.168.113.128:9200/bank/_search
+Content-Type: application/json
 
+{
+  "query": {
+    "term": {
+      "age": "28"
+    }
+  }
+}
 
 
 
