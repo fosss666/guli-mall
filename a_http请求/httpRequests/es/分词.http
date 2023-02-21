@@ -1,0 +1,18 @@
+### ik分词器（可对中文进行分词）
+### ik_smart
+POST http://192.168.113.128:9200/_analyze
+Content-Type:application/json
+
+{
+  "analyzer": "ik_smart",
+  "text": "张永宁最牛了"
+}
+
+### ik_max_word
+POST http://192.168.113.128:9200/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "ik_max_word",
+  "text": "我是中国人"
+}
