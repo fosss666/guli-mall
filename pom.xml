@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>gulimall-search</module>
         <module>gulimall-third-party</module>
         <module>gulimall-gateway</module>
         <module>gulimall-coupon</module>
