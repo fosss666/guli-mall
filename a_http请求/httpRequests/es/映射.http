@@ -1,0 +1,52 @@
+###创建映射
+PUT http://192.168.113.128:9200/my_index
+Content-Type: application/json
+
+{
+  "mappings": {
+    "properties": {
+      "age": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "text"
+      },
+      "email": {
+        "type": "keyword"
+      }
+    }
+  }
+}
+
+###查看映射
+GET http://192.168.113.128:9200/my_index
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
