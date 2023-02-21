@@ -1,0 +1,113 @@
+###搜索 address 中包含 mill 的所有人的年龄分布以及平均年龄，但不显示这些人的详情
+GET http://192.168.113.128:9200/bank/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "address": "mill"
+    }
+  },
+  "aggs": {
+    "ageAggs": {
+      "terms": {
+        "field": "age",
+        "size": 10
+      }
+    },
+    "ageAvg": {
+      "avg": {
+        "field": "age"
+      }
+    }
+  },
+  "size": 0
+}
+
+###按照年龄聚合，并且请求这些年龄段的这些人的平均薪资
+GET http://192.168.113.128:9200/bank/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "ageAggs": {
+      "terms": {
+        "field": "age",
+        "size": 100
+      },
+      "aggs": {
+        "banlanceAvg": {
+          "avg": {
+            "field": "age"
+          }
+        }
+      }
+    }
+  }
+}
+
+###查出所有年龄分布，并且这些年龄段中 M 的平均薪资和 F 的平均薪资以及这个年龄 段的总体平均薪资
+
+GET http://192.168.113.128:9200/bank/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "ageAggs": {
+      "terms": {
+        "field": "age",
+        "size": 100
+      },
+      "aggs": {
+        "genderAgg": {
+          "terms": {
+            "field": "gender.keyword",
+            "size": 100
+          },
+          "aggs": {
+            "banlanceAvg": {
+              "avg": {
+                "field": "balance"
+              }
+            }
+          }
+        },
+        "ageAllBanlanceAvg": {
+          "avg": {
+            "field": "balance"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
