@@ -5,7 +5,7 @@ Content-Type:application/json
 
 {
   "analyzer": "ik_smart",
-  "text": "张永宁最牛了"
+  "text": "我是中国人"
 }
 
 ### ik_max_word
