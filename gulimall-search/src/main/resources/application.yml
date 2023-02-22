@@ -1,0 +1,17 @@
+server:
+  port: 9200
+
+spring:
+  application:
+    name: gulimall-search
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+es:
+  config:
+    hostname: "192.128.113.128"
+    port: 9200
+    scheme: "http"
