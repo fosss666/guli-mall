@@ -12,6 +12,6 @@ spring:
 
 es:
   config:
-    hostname: "192.128.113.128"
+    hostname: "192.168.113.128"
     port: 9200
     scheme: "http"
