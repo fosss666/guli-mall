@@ -23,6 +23,16 @@ public class EsConfig {
     @Value("${es.config.scheme}")
     private String scheme;
 
+    public static final RequestOptions COMMON_OPTIONS;
+    static {
+        RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
+        //builder.addHeader("Authorization", "Bearer " + TOKEN);
+        //builder.setHttpAsyncResponseConsumerFactory(
+        //        new HttpAsyncResponseConsumerFactory
+        //                .HeapBufferedResponseConsumerFactory(30 * 1024 * 1024 * 1024));
+        COMMON_OPTIONS = builder.build();
+    }
+
     @Bean
     public RestHighLevelClient esClient() {
         RestHighLevelClient client = new RestHighLevelClient(
@@ -33,15 +43,6 @@ public class EsConfig {
         return client;
     }
 
-    private static final RequestOptions COMMON_OPTIONS;
-    static {
-        RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
-        //builder.addHeader("Authorization", "Bearer " + TOKEN);
-        //builder.setHttpAsyncResponseConsumerFactory(
-        //        new HttpAsyncResponseConsumerFactory
-        //                .HeapBufferedResponseConsumerFactory(30 * 1024 * 1024 * 1024));
-        COMMON_OPTIONS = builder.build();
-    }
 
 }
 
