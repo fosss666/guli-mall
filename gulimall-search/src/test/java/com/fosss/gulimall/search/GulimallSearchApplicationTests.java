@@ -2,6 +2,8 @@ package com.fosss.gulimall.search;
 
 import com.alibaba.fastjson.JSON;
 import lombok.Data;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -30,9 +32,19 @@ public class GulimallSearchApplicationTests {
     }
 
     /**
+     * 测试根据id查询数据
+     */
+    @Test
+    public void testGet() throws IOException {
+        GetRequest getRequest = new GetRequest("users");
+        getRequest.id("1");
+        GetResponse response = client.get(getRequest, RequestOptions.DEFAULT);
+        System.out.println("response = " + response);
+    }
+
+    /**
      * 测试保存数据
      */
-
     @Test
     public void testIndexData() throws IOException {
         User user = new User();
