@@ -53,8 +53,8 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     @Override
     public PageUtils queryPage(Long catelogId, Map<String, Object> params, String type) {
 
-        String key =null;
-        if(params.get("key")!=null) {
+        String key = null;
+        if (params.get("key") != null) {
             key = params.get("key").toString();
         }
         LambdaQueryWrapper<AttrEntity> wrapper = new LambdaQueryWrapper<AttrEntity>()
@@ -176,6 +176,15 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
                 );
             }
         }
+    }
+
+    /**
+     * 根据attrId查询可被检索的属性id
+     */
+    @Override
+    public List<Long> getCanSearchAttrIds(List<Long> attrIds) {
+        LambdaQueryWrapper<AttrEntity> wrapper = new LambdaQueryWrapper<>();
+        return baseMapper.getCanSearchAttrIds(attrIds, ProductConstant.AttrSearchTypeEnum.CAN_SEARCH.getCode());
     }
 }
 

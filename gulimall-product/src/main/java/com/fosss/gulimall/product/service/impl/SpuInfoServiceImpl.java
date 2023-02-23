@@ -223,6 +223,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         baseMapper.selectPage(iPage, wrapper);
         return new PageUtils(iPage);
     }
+
     /**
      * 商品上架
      * /product/spuinfo/{spuId}/up
@@ -232,7 +233,19 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         //根据spuId查询sku
         List<SkuInfoEntity> skus = skuInfoService.list(new LambdaQueryWrapper<SkuInfoEntity>().eq(SkuInfoEntity::getSpuId, spuId));
 
-        // TODO 3.查询spu的规格属性 attrId attrName attrValue
+        //查询spu的可以进行检索的规格属性 attrId attrName attrValue
+        List<ProductAttrValueEntity> spuAttrValue = productAttrValueService.getSpuAttrValue(spuId);
+        //根据attrId查询可被检索的属性
+        List<Long> attrIds = spuAttrValue.stream().map(item -> item.getAttrId()).collect(Collectors.toList());
+        List<Long> canSearchAttrIds = attrService.getCanSearchAttrIds(attrIds);
+        //转为set
+        Set<Long> set = new HashSet<>(canSearchAttrIds);
+        //从spuAttrValue过滤可检索的attr
+        List<SkuEsModel.Attr> attrs = spuAttrValue.stream().filter(item -> set.contains(item.getAttrId())).map((item) -> {
+            SkuEsModel.Attr attr = new SkuEsModel.Attr();
+            BeanUtils.copyProperties(item, attr);
+            return attr;
+        }).collect(Collectors.toList());
 
         //构建统一类型
         List<SkuEsModel> collect = skus.stream().map((sku) -> {
@@ -245,7 +258,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
             // TODO 1. 远程调用微服务查询是否有库存 hasStock
 
-            // TODO 2. 设置初始热度评分 hotScore
+            //设置初始热度评分 hotScore
+            skuEsModel.setHotScore(0L);
 
             // brandName; brandImg; catalogName;
             BrandEntity brand = brandService.getById(sku.getBrandId());
@@ -253,6 +267,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             skuEsModel.setBrandImg(brand.getLogo());
             CategoryEntity category = categoryService.getById(sku.getCatalogId());
             skuEsModel.setCatalogName(category.getName());
+
+            //设置可检索的规格属性
+            skuEsModel.setAttrs(attrs);
 
             //返回映射对象
             return skuEsModel;

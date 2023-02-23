@@ -6,6 +6,7 @@ import com.fosss.gulimall.product.entity.AttrEntity;
 import com.fosss.gulimall.product.vo.AttrRespVo;
 import com.fosss.gulimall.product.vo.AttrVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,5 +31,10 @@ public interface AttrService extends IService<AttrEntity> {
      * 修改属性详情
      */
     void updateAttr(AttrVo attr);
+
+    /**
+     * 根据attrId查询可被检索的属性id
+     */
+    List<Long> getCanSearchAttrIds(List<Long> attrIds);
 }
 
