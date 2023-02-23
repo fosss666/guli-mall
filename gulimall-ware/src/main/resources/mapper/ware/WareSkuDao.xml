@@ -3,7 +3,7 @@
 
 <mapper namespace="com.fosss.gulimall.ware.dao.WareSkuDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.fosss.gulimall.ware.entity.WareSkuEntity" id="wareSkuMap">
         <result property="id" column="id"/>
         <result property="skuId" column="sku_id"/>
@@ -12,6 +12,15 @@
         <result property="skuName" column="sku_name"/>
         <result property="stockLocked" column="stock_locked"/>
     </resultMap>
+
+    <!--    查询该sku库存量
+         select SUM(stock-stock_locked) from wms_ware_sku where sku_id=1
+    -->
+    <select id="hasStock" resultType="java.lang.Integer">
+        select SUM(stock - stock_locked)
+        from wms_ware_sku
+        where sku_id = #{skuId}
+    </select>
 
 
 </mapper>

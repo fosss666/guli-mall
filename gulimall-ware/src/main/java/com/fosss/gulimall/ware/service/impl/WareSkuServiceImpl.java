@@ -5,6 +5,8 @@ import com.fosss.common.utils.R;
 import com.fosss.gulimall.ware.feign.ProductFeignService;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -90,6 +92,20 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             wareSkuEntity.setStock(wareSkuEntity.getStock() + skuNum);
             baseMapper.updateById(wareSkuEntity);
         }
+    }
+
+    /**
+     * 根据skuId查询是否有库存
+     */
+    @Override
+    public Map<Long, Boolean> hasStock(List<Long> skuIds) {
+        Map<Long, Boolean> map = new HashMap<>();
+        for (Long skuId : skuIds) {
+            //查询该sku的库存量
+            int count = baseMapper.hasStock(skuId);
+            map.put(skuId, count > 0);
+        }
+        return map;
     }
 
 }

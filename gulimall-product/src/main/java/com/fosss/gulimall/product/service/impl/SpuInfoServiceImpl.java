@@ -10,6 +10,7 @@ import com.fosss.common.to.es.SkuEsModel;
 import com.fosss.common.utils.R;
 import com.fosss.gulimall.product.entity.*;
 import com.fosss.gulimall.product.feign.CouponFeignService;
+import com.fosss.gulimall.product.feign.WareFeignService;
 import com.fosss.gulimall.product.service.*;
 import com.fosss.gulimall.product.vo.*;
 import org.springframework.beans.BeanUtils;
@@ -56,6 +57,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private BrandService brandService;
     @Resource
     private CategoryService categoryService;
+    @Resource
+    private WareFeignService wareFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -228,6 +231,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
      * 商品上架
      * /product/spuinfo/{spuId}/up
      */
+    @Transactional
     @Override
     public void up(Long spuId) {
         //根据spuId查询sku
@@ -247,7 +251,21 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             return attr;
         }).collect(Collectors.toList());
 
+        //获取skuId
+        List<Long> skuIds = skus.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
+        //查询各个sku是否有库存
+        Map<Long, Boolean> hasStockMap = null;
+        Boolean flag = false;
+        try {
+            hasStockMap = wareFeignService.hasStock(skuIds);
+            flag = true;
+        } catch (Exception e) {
+            log.error("远程调用查询是否有库存失败：" + e.getMessage());
+        }
+
         //构建统一类型
+        Map<Long, Boolean> finalHasStockMap = hasStockMap;
+        Boolean finalFlag = flag;
         List<SkuEsModel> collect = skus.stream().map((sku) -> {
             SkuEsModel skuEsModel = new SkuEsModel();
             //拷贝相同名称的属性
@@ -256,7 +274,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             skuEsModel.setSkuPrice(sku.getPrice());
             skuEsModel.setSkuImg(sku.getSkuDefaultImg());
 
-            // TODO 1. 远程调用微服务查询是否有库存 hasStock
+            //设置是否有库存 hasStock
+            if (finalFlag) {
+                //远程调用成功
+                skuEsModel.setHasStock(finalHasStockMap.get(sku.getSkuId()));
+            } else {
+                //远程调用失败，默认有库存
+                skuEsModel.setHasStock(true);
+            }
 
             //设置初始热度评分 hotScore
             skuEsModel.setHotScore(0L);
