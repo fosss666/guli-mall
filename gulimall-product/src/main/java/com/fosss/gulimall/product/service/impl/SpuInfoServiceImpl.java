@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.additional.query.impl.LambdaQu
 import com.fosss.common.to.MemberPrice;
 import com.fosss.common.to.SkuReductionTo;
 import com.fosss.common.to.SpuBoundTo;
+import com.fosss.common.to.es.SkuEsModel;
 import com.fosss.common.utils.R;
 import com.fosss.gulimall.product.entity.*;
 import com.fosss.gulimall.product.feign.CouponFeignService;
@@ -51,6 +52,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private SkuImagesService skuImagesService;
     @Resource
     private CouponFeignService couponFeignService;
+    @Resource
+    private BrandService brandService;
+    @Resource
+    private CategoryService categoryService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -217,6 +222,44 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         baseMapper.selectPage(iPage, wrapper);
         return new PageUtils(iPage);
+    }
+    /**
+     * 商品上架
+     * /product/spuinfo/{spuId}/up
+     */
+    @Override
+    public void up(Long spuId) {
+        //根据spuId查询sku
+        List<SkuInfoEntity> skus = skuInfoService.list(new LambdaQueryWrapper<SkuInfoEntity>().eq(SkuInfoEntity::getSpuId, spuId));
+
+        // TODO 3.查询spu的规格属性 attrId attrName attrValue
+
+        //构建统一类型
+        List<SkuEsModel> collect = skus.stream().map((sku) -> {
+            SkuEsModel skuEsModel = new SkuEsModel();
+            //拷贝相同名称的属性
+            BeanUtils.copyProperties(sku, skuEsModel);
+            //设置其他属性 skuPrice skuImage
+            skuEsModel.setSkuPrice(sku.getPrice());
+            skuEsModel.setSkuImg(sku.getSkuDefaultImg());
+
+            // TODO 1. 远程调用微服务查询是否有库存 hasStock
+
+            // TODO 2. 设置初始热度评分 hotScore
+
+            // brandName; brandImg; catalogName;
+            BrandEntity brand = brandService.getById(sku.getBrandId());
+            skuEsModel.setBrandName(brand.getName());
+            skuEsModel.setBrandImg(brand.getLogo());
+            CategoryEntity category = categoryService.getById(sku.getCatalogId());
+            skuEsModel.setCatalogName(category.getName());
+
+            //返回映射对象
+            return skuEsModel;
+        }).collect(Collectors.toList());
+
+        // TODO 4.远程调用微服务向es发送数据
+
     }
 }
 

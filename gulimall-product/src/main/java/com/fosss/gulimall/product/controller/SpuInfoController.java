@@ -13,7 +13,6 @@ import com.fosss.common.utils.PageUtils;
 import com.fosss.common.utils.R;
 
 
-
 /**
  * spu信息
  *
@@ -28,10 +27,20 @@ public class SpuInfoController {
     private SpuInfoService spuInfoService;
 
     /**
+     * 商品上架
+     * /product/spuinfo/{spuId}/up
+     */
+    @PostMapping("/{spuId}/up")
+    public R up(@PathVariable("spuId") Long spuId) {
+        spuInfoService.up(spuId);
+        return R.ok();
+    }
+
+    /**
      * spu检索
      */
     @RequestMapping("/list")
-        public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = spuInfoService.listByConditions(params);
 
         return R.ok().put("page", page);
@@ -42,8 +51,8 @@ public class SpuInfoController {
      * 信息
      */
     @RequestMapping("/info/{id}")
-        public R info(@PathVariable("id") Long id){
-		SpuInfoEntity spuInfo = spuInfoService.getById(id);
+    public R info(@PathVariable("id") Long id) {
+        SpuInfoEntity spuInfo = spuInfoService.getById(id);
 
         return R.ok().put("spuInfo", spuInfo);
     }
@@ -52,8 +61,8 @@ public class SpuInfoController {
      * 保存spu完整信息
      */
     @RequestMapping("/save")
-        public R save(@RequestBody SpuSaveVo spuSaveVo){
-		spuInfoService.saveSpu(spuSaveVo);
+    public R save(@RequestBody SpuSaveVo spuSaveVo) {
+        spuInfoService.saveSpu(spuSaveVo);
 
         return R.ok();
     }
@@ -62,8 +71,8 @@ public class SpuInfoController {
      * 修改
      */
     @RequestMapping("/update")
-        public R update(@RequestBody SpuInfoEntity spuInfo){
-		spuInfoService.updateById(spuInfo);
+    public R update(@RequestBody SpuInfoEntity spuInfo) {
+        spuInfoService.updateById(spuInfo);
 
         return R.ok();
     }
@@ -72,8 +81,8 @@ public class SpuInfoController {
      * 删除
      */
     @RequestMapping("/delete")
-        public R delete(@RequestBody Long[] ids){
-		spuInfoService.removeByIds(Arrays.asList(ids));
+    public R delete(@RequestBody Long[] ids) {
+        spuInfoService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }
