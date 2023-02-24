@@ -1,5 +1,6 @@
 package com.fosss.gulimall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fosss.gulimall.product.service.CategoryBrandRelationService;
 import org.springframework.stereotype.Service;
 
@@ -101,6 +102,13 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     }
 
+    /**
+     * 查询一级分类
+     */
+    @Override
+    public List<CategoryEntity> getLevel1() {
+        return baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getCatLevel, 1));
+    }
 }
 
 
