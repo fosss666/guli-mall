@@ -17,6 +17,6 @@ public interface WareFeignService {
     /**
      * 根据skuId查询是否有库存  库存=现有库存-锁定的库存
      */
-    @PostMapping("/hasStock")
+    @PostMapping("/ware/waresku/hasStock")
     Map<Long, Boolean> hasStock(@RequestBody List<Long> skuIds);
 }

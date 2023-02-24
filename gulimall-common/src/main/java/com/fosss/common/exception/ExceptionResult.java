@@ -19,7 +19,8 @@ import lombok.Data;
  */
 public enum ExceptionResult {
     UNKNOWN_EXCEPTION(10000, "未知异常"),
-    VALID_EXCEPTION(10001, "数据校验异常");
+    VALID_EXCEPTION(10001, "数据校验异常"),
+    ES_SAVE_EXCEPTION(11000, "商品上架异常");
 
     private int code;
     private String message;

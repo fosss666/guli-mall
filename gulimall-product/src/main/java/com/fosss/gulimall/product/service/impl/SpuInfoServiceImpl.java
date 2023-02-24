@@ -1,8 +1,10 @@
 package com.fosss.gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.additional.query.impl.LambdaQueryChainWrapper;
+import com.fosss.common.constant.ProductConstant;
 import com.fosss.common.to.MemberPrice;
 import com.fosss.common.to.SkuReductionTo;
 import com.fosss.common.to.SpuBoundTo;
@@ -10,6 +12,7 @@ import com.fosss.common.to.es.SkuEsModel;
 import com.fosss.common.utils.R;
 import com.fosss.gulimall.product.entity.*;
 import com.fosss.gulimall.product.feign.CouponFeignService;
+import com.fosss.gulimall.product.feign.SearchFeignService;
 import com.fosss.gulimall.product.feign.WareFeignService;
 import com.fosss.gulimall.product.service.*;
 import com.fosss.gulimall.product.vo.*;
@@ -59,6 +62,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private CategoryService categoryService;
     @Resource
     private WareFeignService wareFeignService;
+    @Resource
+    private SearchFeignService searchFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -255,7 +260,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         List<Long> skuIds = skus.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
         //查询各个sku是否有库存
         Map<Long, Boolean> hasStockMap = null;
-        Boolean flag = false;
+        boolean flag = false;
         try {
             hasStockMap = wareFeignService.hasStock(skuIds);
             flag = true;
@@ -265,7 +270,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         //构建统一类型
         Map<Long, Boolean> finalHasStockMap = hasStockMap;
-        Boolean finalFlag = flag;
+        boolean finalFlag = flag;
         List<SkuEsModel> collect = skus.stream().map((sku) -> {
             SkuEsModel skuEsModel = new SkuEsModel();
             //拷贝相同名称的属性
@@ -300,8 +305,24 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             return skuEsModel;
         }).collect(Collectors.toList());
 
-        // TODO 4.远程调用微服务向es发送数据
+        // 远程调用微服务向es发送数据
+        R r = searchFeignService.productSave(collect);
+        if (r.getCode() == 0) {
+            //远程调用成功
+            //修改spu状态
+            this.updateStatus(spuId, ProductConstant.ProductStatus.SPU_UP.getCode());
+        }
+    }
 
+    //修改spu状态
+    private void updateStatus(Long spuId, int code) {
+        LambdaUpdateWrapper<SpuInfoEntity> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(SpuInfoEntity::getId, spuId);
+        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+        spuInfoEntity.setId(spuId);
+        spuInfoEntity.setPublishStatus(code);
+        spuInfoEntity.setUpdateTime(new Date());
+        baseMapper.updateById(spuInfoEntity);
     }
 }
 
