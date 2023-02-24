@@ -72,3 +72,23 @@ Content-Type: application/json
     }
   }
 }
+
+###
+GET http://192.168.113.128:9200/product/_search
+
+###
+DELETE http://192.168.113.128:9200/product
+
+
+
+
+
+
+
+
+
+
+
+
+
+

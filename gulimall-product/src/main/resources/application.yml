@@ -15,13 +15,14 @@ spring:
     name: gulimall-product
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+  thymeleaf:  #关闭thymeleaf缓存
+    cache: false
 mybatis-plus:
   global-config:
     db-config:
       id-type: auto
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
 
 
 

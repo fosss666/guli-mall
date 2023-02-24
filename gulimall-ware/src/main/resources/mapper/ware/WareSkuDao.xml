@@ -16,7 +16,7 @@
     <!--    查询该sku库存量
          select SUM(stock-stock_locked) from wms_ware_sku where sku_id=1
     -->
-    <select id="hasStock" resultType="java.lang.Integer">
+    <select id="hasStock" resultType="java.lang.Long">
         select SUM(stock - stock_locked)
         from wms_ware_sku
         where sku_id = #{skuId}

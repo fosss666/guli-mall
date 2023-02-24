@@ -15,5 +15,5 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface WareSkuDao extends BaseMapper<WareSkuEntity> {
     //查询该sku的库存量
-    int hasStock(@Param("skuId") Long skuId);
+    Long hasStock(@Param("skuId") Long skuId);
 }

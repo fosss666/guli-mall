@@ -102,8 +102,12 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         Map<Long, Boolean> map = new HashMap<>();
         for (Long skuId : skuIds) {
             //查询该sku的库存量
-            int count = baseMapper.hasStock(skuId);
-            map.put(skuId, count > 0);
+            Long count = baseMapper.hasStock(skuId);
+            if (count != null) {
+                map.put(skuId, count > 0);
+            } else {
+                map.put(skuId, false);
+            }
         }
         return map;
     }

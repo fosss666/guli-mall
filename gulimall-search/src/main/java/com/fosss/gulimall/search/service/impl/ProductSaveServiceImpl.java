@@ -12,6 +12,7 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.List;
  * @description：
  */
 @Slf4j
+@Service
 public class ProductSaveServiceImpl implements ProductSaveService {
 
     @Resource
