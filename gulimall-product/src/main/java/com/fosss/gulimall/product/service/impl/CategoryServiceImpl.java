@@ -2,12 +2,14 @@ package com.fosss.gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fosss.gulimall.product.service.CategoryBrandRelationService;
+import com.fosss.gulimall.product.vo.Catelog2Vo;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -108,6 +110,41 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     @Override
     public List<CategoryEntity> getLevel1() {
         return baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getCatLevel, 1));
+    }
+
+    /**
+     * 获取二三级分类
+     */
+    @Override
+    public Map<String, List<Catelog2Vo>> getCatelogJson() {
+        //获取一级分类
+        List<CategoryEntity> level1 = getLevel1();
+        //对每一个一级分类封装对应的二级分类
+        Map<String, List<Catelog2Vo>> res = level1.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+            //查询当前id对应的二级分类
+            List<CategoryEntity> level2 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, v.getCatId()));
+            List<Catelog2Vo> collect = level2.stream().map(l2 -> {
+                Catelog2Vo catelog2Vo = new Catelog2Vo();
+                catelog2Vo.setId(l2.getCatId().toString());
+                catelog2Vo.setCatalog1Id(v.getCatId().toString());
+                catelog2Vo.setName(l2.getName());
+                //查询当前二级分类对应的三级分类
+                List<CategoryEntity> level3 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, l2.getCatId()));
+                //将三级分类封装成所需vo
+                List<Catelog2Vo.Category3Vo> l3List = level3.stream().map(l3 -> {
+                    Catelog2Vo.Category3Vo category3Vo = new Catelog2Vo.Category3Vo();
+                    category3Vo.setId(l3.getCatId().toString());
+                    category3Vo.setName(l3.getName());
+                    category3Vo.setCatalog2Id(l2.getCatId().toString());
+                    return category3Vo;
+                }).collect(Collectors.toList());
+                catelog2Vo.setCatalog3List(l3List);
+                return catelog2Vo;
+            }).collect(Collectors.toList());
+            return collect;
+        }));
+
+        return res;
     }
 }
 
