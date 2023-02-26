@@ -1,0 +1,2 @@
+启动：cmd->nginx.exe
+停止：cmd->nginx.exe -s stop （直接关掉黑窗口无法关闭nginx）
