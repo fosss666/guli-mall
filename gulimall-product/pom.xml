@@ -19,10 +19,27 @@
     </properties>
     <dependencies>
 
+        <!--
+            说明：springboot2.0以后默认使用lettuce作为操作redis的客户端，它使用netty进行网络通信
+            lettuce的bug导致netty堆外内存溢出  netty如果没有指定堆外内存，默认使用-Xmx300m,可以通过-Dio.netty.maxDirectMemory进行设置
+            解决方案：不能使用-Dio.netty.maxDirectMemory只去调大堆外内存
+                    1.升级lettuce客户端（改源码？）  2.切换使用jedis代替lettuce   采用方案2
+        -->
+        <!--jedis-->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
         <!--redis-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.lettuce</groupId>
+                    <artifactId>lettuce-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--dev-tools热部署-->
         <dependency>
@@ -36,11 +53,11 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <!--阿里云-->
-<!--        <dependency>-->
-<!--            <groupId>com.aliyun.oss</groupId>-->
-<!--            <artifactId>aliyun-sdk-oss</artifactId>-->
-<!--            <version>3.15.1</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.aliyun.oss</groupId>-->
+        <!--            <artifactId>aliyun-sdk-oss</artifactId>-->
+        <!--            <version>3.15.1</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.fosss.gulimall</groupId>
             <artifactId>gulimall-common</artifactId>
