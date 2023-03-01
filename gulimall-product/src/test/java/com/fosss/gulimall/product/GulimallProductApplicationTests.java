@@ -7,6 +7,8 @@ import com.fosss.gulimall.product.service.BrandService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
@@ -15,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -23,12 +26,25 @@ public class GulimallProductApplicationTests {
     private BrandService brandService;
     @Resource
     private AttrGroupService attrGroupService;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 测试redis
+     */
+    @Test
+    public void testRedis() {
+        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+        ops.set("hello", "world_" + UUID.randomUUID());
+        String hello = ops.get("hello");
+        System.out.println("hello = " + hello);
+    }
 
     /**
      * 测试获取分类的完整路径
      */
     @Test
-    public void testGetPath(){
+    public void testGetPath() {
         AttrGroupEntity info = attrGroupService.getInfo(1L);
         Long[] catelogPath = info.getCatelogPath();
         System.out.println("catelogPath = " + Arrays.toString(catelogPath));
@@ -52,7 +68,7 @@ public class GulimallProductApplicationTests {
     public void testSelect() {
         List<BrandEntity> list = brandService.list();
         Iterator<BrandEntity> iterator = list.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             System.out.println(iterator.next());
         }
     }

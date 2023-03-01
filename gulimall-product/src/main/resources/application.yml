@@ -17,13 +17,15 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
   thymeleaf:  #关闭thymeleaf缓存
     cache: false
+  redis:
+    host: 192.168.113.128
+    port: 6379
 mybatis-plus:
   global-config:
     db-config:
       id-type: auto
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
 
 
 
