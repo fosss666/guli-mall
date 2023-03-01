@@ -1,8 +1,13 @@
 package com.fosss.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fosss.common.constant.RedisConstant;
 import com.fosss.gulimall.product.service.CategoryBrandRelationService;
 import com.fosss.gulimall.product.vo.Catelog2Vo;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +26,7 @@ import com.fosss.gulimall.product.dao.CategoryDao;
 import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.service.CategoryService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
@@ -30,6 +36,8 @@ import javax.annotation.Resource;
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
     @Resource
     private CategoryBrandRelationService categoryBrandRelationService;
+    @Resource
+    private StringRedisTemplate stringRelationService;
 
     /**
      * 逻辑删除
@@ -114,9 +122,28 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     /**
      * 获取二三级分类
+     * 使用缓存进行优化
      */
     @Override
     public Map<String, List<Catelog2Vo>> getCatelogJson() {
+        ValueOperations<String, String> ops = stringRelationService.opsForValue();
+        String categoryJson = ops.get(RedisConstant.PRODUCT_CATEGORY_KEY);
+        if (StringUtils.isEmpty(categoryJson)) {
+            //缓存中没有数据，则从数据库中查询
+            Map<String, List<Catelog2Vo>> listMap = getCatelog();
+            //存入缓存
+            String s = JSON.toJSONString(listMap);
+            ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, s);
+            //返回数据
+            return listMap;
+        }
+        //缓存中有数据，则取出并转为所需类型并返回
+        Map<String, List<Catelog2Vo>> stringListMap = JSON.parseObject(categoryJson, new TypeReference<Map<String, List<Catelog2Vo>>>() {
+        });
+        return stringListMap;
+    }
+
+    private Map<String, List<Catelog2Vo>> getCatelog() {
         //性能优化-空间换时间-遍多次查询数据库为一次查询数据库
         //查询所有数据
         List<CategoryEntity> selectList = baseMapper.selectList(null);
