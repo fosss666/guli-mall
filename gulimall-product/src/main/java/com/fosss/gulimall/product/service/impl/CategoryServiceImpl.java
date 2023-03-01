@@ -117,19 +117,26 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      */
     @Override
     public Map<String, List<Catelog2Vo>> getCatelogJson() {
+        //性能优化-空间换时间-遍多次查询数据库为一次查询数据库
+        //查询所有数据
+        List<CategoryEntity> selectList = baseMapper.selectList(null);
+
         //获取一级分类
-        List<CategoryEntity> level1 = getLevel1();
+        //List<CategoryEntity> level1 = getLevel1();
+        List<CategoryEntity> level1 = getChildren(selectList, 0L);
         //对每一个一级分类封装对应的二级分类
         Map<String, List<Catelog2Vo>> res = level1.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
             //查询当前id对应的二级分类
-            List<CategoryEntity> level2 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, v.getCatId()));
+            //List<CategoryEntity> level2 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, v.getCatId()));
+            List<CategoryEntity> level2 = getChildren(selectList, v.getCatId());
             List<Catelog2Vo> collect = level2.stream().map(l2 -> {
                 Catelog2Vo catelog2Vo = new Catelog2Vo();
                 catelog2Vo.setId(l2.getCatId().toString());
                 catelog2Vo.setCatalog1Id(v.getCatId().toString());
                 catelog2Vo.setName(l2.getName());
                 //查询当前二级分类对应的三级分类
-                List<CategoryEntity> level3 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, l2.getCatId()));
+                //List<CategoryEntity> level3 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, l2.getCatId()));
+                List<CategoryEntity> level3 = getChildren(selectList, l2.getCatId());
                 //将三级分类封装成所需vo
                 List<Catelog2Vo.Category3Vo> l3List = level3.stream().map(l3 -> {
                     Catelog2Vo.Category3Vo category3Vo = new Catelog2Vo.Category3Vo();
@@ -145,6 +152,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         }));
 
         return res;
+    }
+
+    //获取子分类
+    private List<CategoryEntity> getChildren(List<CategoryEntity> selectList, Long parentCid) {
+        return selectList.stream().filter(item -> item.getParentCid().equals(parentCid)).collect(Collectors.toList());
     }
 }
 
