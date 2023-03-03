@@ -10,10 +10,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -123,6 +121,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     /**
      * 获取二三级分类
      * 使用缓存进行优化
+     * 解决缓存可能出现的问题：
+     * 1.如果数据库中不存在，则短时间缓存null：解决缓存穿透问题（大量访问不存在的值，缓存中没有，同时到数据库中查询）
+     * 2.为缓存设置不同的过期时间：解决缓存雪崩问题（缓存同时过期）
+     * 3.加锁：解决缓存击穿问题（热点数据在缓存过期后被大量访问）
      */
     @Override
     public Map<String, List<Catelog2Vo>> getCatelogJson() {
@@ -132,12 +134,20 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             //缓存中没有数据，则从数据库中查询
             Map<String, List<Catelog2Vo>> listMap = getCatelog();
             //存入缓存
+            //解决缓存1问题
+            if (listMap == null || listMap.size() == 0) {
+                //缓存空数据
+                ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, "null", RedisConstant.CACHE_NULL_TIME, TimeUnit.MILLISECONDS);
+            }
             String s = JSON.toJSONString(listMap);
             ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, s);
             //返回数据
             return listMap;
         }
         //缓存中有数据，则取出并转为所需类型并返回
+        if (categoryJson.equals("null")) {
+            return Collections.emptyMap();
+        }
         Map<String, List<Catelog2Vo>> stringListMap = JSON.parseObject(categoryJson, new TypeReference<Map<String, List<Catelog2Vo>>>() {
         });
         return stringListMap;

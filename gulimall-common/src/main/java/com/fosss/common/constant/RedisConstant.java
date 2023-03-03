@@ -8,6 +8,9 @@ package com.fosss.common.constant;
  */
 public class RedisConstant {
     public static final String PRODUCT_CATEGORY_KEY = "categoryJson";
+
+    //空数据缓存时间
+    public static final long CACHE_NULL_TIME=3000;
 }
 
 
