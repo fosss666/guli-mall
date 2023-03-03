@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 
+import static com.fosss.common.constant.RedisConstant.CACHE_OTHER_TIME;
+
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
@@ -137,10 +139,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             //解决缓存1问题
             if (listMap == null || listMap.size() == 0) {
                 //缓存空数据
-                ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, "null", RedisConstant.CACHE_NULL_TIME, TimeUnit.MILLISECONDS);
+                ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, "null", RedisConstant.CACHE_NULL_TIME, TimeUnit.SECONDS);
+            } else {
+                String s = JSON.toJSONString(listMap);
+                ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, s, CACHE_OTHER_TIME, TimeUnit.SECONDS);
             }
-            String s = JSON.toJSONString(listMap);
-            ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, s);
             //返回数据
             return listMap;
         }
