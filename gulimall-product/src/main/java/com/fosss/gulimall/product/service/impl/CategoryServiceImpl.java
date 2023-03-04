@@ -156,43 +156,110 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return stringListMap;
     }
 
+    /**
+     * 分布式锁解决缓存击穿，分布式项目应采用
+     */
     private Map<String, List<Catelog2Vo>> getCatelog() {
-        //性能优化-空间换时间-遍多次查询数据库为一次查询数据库
-        //查询所有数据
-        List<CategoryEntity> selectList = baseMapper.selectList(null);
+            //性能优化-空间换时间-遍多次查询数据库为一次查询数据库
+            //查询所有数据
+            List<CategoryEntity> selectList = baseMapper.selectList(null);
 
-        //获取一级分类
-        //List<CategoryEntity> level1 = getLevel1();
-        List<CategoryEntity> level1 = getChildren(selectList, 0L);
-        //对每一个一级分类封装对应的二级分类
-        Map<String, List<Catelog2Vo>> res = level1.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
-            //查询当前id对应的二级分类
-            //List<CategoryEntity> level2 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, v.getCatId()));
-            List<CategoryEntity> level2 = getChildren(selectList, v.getCatId());
-            List<Catelog2Vo> collect = level2.stream().map(l2 -> {
-                Catelog2Vo catelog2Vo = new Catelog2Vo();
-                catelog2Vo.setId(l2.getCatId().toString());
-                catelog2Vo.setCatalog1Id(v.getCatId().toString());
-                catelog2Vo.setName(l2.getName());
-                //查询当前二级分类对应的三级分类
-                //List<CategoryEntity> level3 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, l2.getCatId()));
-                List<CategoryEntity> level3 = getChildren(selectList, l2.getCatId());
-                //将三级分类封装成所需vo
-                List<Catelog2Vo.Category3Vo> l3List = level3.stream().map(l3 -> {
-                    Catelog2Vo.Category3Vo category3Vo = new Catelog2Vo.Category3Vo();
-                    category3Vo.setId(l3.getCatId().toString());
-                    category3Vo.setName(l3.getName());
-                    category3Vo.setCatalog2Id(l2.getCatId().toString());
-                    return category3Vo;
+            //获取一级分类
+            //List<CategoryEntity> level1 = getLevel1();
+            List<CategoryEntity> level1 = getChildren(selectList, 0L);
+            //对每一个一级分类封装对应的二级分类
+            Map<String, List<Catelog2Vo>> res = level1.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+                //查询当前id对应的二级分类
+                //List<CategoryEntity> level2 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, v.getCatId()));
+                List<CategoryEntity> level2 = getChildren(selectList, v.getCatId());
+                List<Catelog2Vo> collect = level2.stream().map(l2 -> {
+                    Catelog2Vo catelog2Vo = new Catelog2Vo();
+                    catelog2Vo.setId(l2.getCatId().toString());
+                    catelog2Vo.setCatalog1Id(v.getCatId().toString());
+                    catelog2Vo.setName(l2.getName());
+                    //查询当前二级分类对应的三级分类
+                    //List<CategoryEntity> level3 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, l2.getCatId()));
+                    List<CategoryEntity> level3 = getChildren(selectList, l2.getCatId());
+                    //将三级分类封装成所需vo
+                    List<Catelog2Vo.Category3Vo> l3List = level3.stream().map(l3 -> {
+                        Catelog2Vo.Category3Vo category3Vo = new Catelog2Vo.Category3Vo();
+                        category3Vo.setId(l3.getCatId().toString());
+                        category3Vo.setName(l3.getName());
+                        category3Vo.setCatalog2Id(l2.getCatId().toString());
+                        return category3Vo;
+                    }).collect(Collectors.toList());
+                    catelog2Vo.setCatalog3List(l3List);
+                    return catelog2Vo;
                 }).collect(Collectors.toList());
-                catelog2Vo.setCatalog3List(l3List);
-                return catelog2Vo;
-            }).collect(Collectors.toList());
-            return collect;
-        }));
+                return collect;
+            }));
 
-        return res;
+            //将加入缓存操作放在释放锁之前!!
+            //ValueOperations<String, String> ops = stringRelationService.opsForValue();
+            //if (res.size() == 0) {
+            //    //缓存空数据
+            //    ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, "null", RedisConstant.CACHE_NULL_TIME, TimeUnit.SECONDS);
+            //} else {
+            //    String s = JSON.toJSONString(res);
+            //    ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, s, CACHE_OTHER_TIME, TimeUnit.SECONDS);
+            //}
+
+            return res;
+
     }
+    /**
+     * 加本地锁解决缓存击穿，单体项目可采用
+     */
+    //private Map<String, List<Catelog2Vo>> getCatelog() {
+    //    //加本地锁，单体项目可用
+    //    synchronized (this) {
+    //        //性能优化-空间换时间-遍多次查询数据库为一次查询数据库
+    //        //查询所有数据
+    //        List<CategoryEntity> selectList = baseMapper.selectList(null);
+    //
+    //        //获取一级分类
+    //        //List<CategoryEntity> level1 = getLevel1();
+    //        List<CategoryEntity> level1 = getChildren(selectList, 0L);
+    //        //对每一个一级分类封装对应的二级分类
+    //        Map<String, List<Catelog2Vo>> res = level1.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+    //            //查询当前id对应的二级分类
+    //            //List<CategoryEntity> level2 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, v.getCatId()));
+    //            List<CategoryEntity> level2 = getChildren(selectList, v.getCatId());
+    //            List<Catelog2Vo> collect = level2.stream().map(l2 -> {
+    //                Catelog2Vo catelog2Vo = new Catelog2Vo();
+    //                catelog2Vo.setId(l2.getCatId().toString());
+    //                catelog2Vo.setCatalog1Id(v.getCatId().toString());
+    //                catelog2Vo.setName(l2.getName());
+    //                //查询当前二级分类对应的三级分类
+    //                //List<CategoryEntity> level3 = baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, l2.getCatId()));
+    //                List<CategoryEntity> level3 = getChildren(selectList, l2.getCatId());
+    //                //将三级分类封装成所需vo
+    //                List<Catelog2Vo.Category3Vo> l3List = level3.stream().map(l3 -> {
+    //                    Catelog2Vo.Category3Vo category3Vo = new Catelog2Vo.Category3Vo();
+    //                    category3Vo.setId(l3.getCatId().toString());
+    //                    category3Vo.setName(l3.getName());
+    //                    category3Vo.setCatalog2Id(l2.getCatId().toString());
+    //                    return category3Vo;
+    //                }).collect(Collectors.toList());
+    //                catelog2Vo.setCatalog3List(l3List);
+    //                return catelog2Vo;
+    //            }).collect(Collectors.toList());
+    //            return collect;
+    //        }));
+    //
+    //        //将加入缓存操作放在释放锁之前!!
+    //        ValueOperations<String, String> ops = stringRelationService.opsForValue();
+    //        if (res.size() == 0) {
+    //            //缓存空数据
+    //            ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, "null", RedisConstant.CACHE_NULL_TIME, TimeUnit.SECONDS);
+    //        } else {
+    //            String s = JSON.toJSONString(res);
+    //            ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, s, CACHE_OTHER_TIME, TimeUnit.SECONDS);
+    //        }
+    //
+    //        return res;
+    //    }
+    //}
 
     //获取子分类
     private List<CategoryEntity> getChildren(List<CategoryEntity> selectList, Long parentCid) {
