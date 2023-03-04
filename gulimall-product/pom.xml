@@ -20,6 +20,17 @@
     <dependencies>
 
         <!--
+            整合redisson分布式锁：
+            1.导入依赖
+            2.配置redisson 官方文档：https://github.com/redisson/redisson/wiki/1.-%E6%A6%82%E8%BF%B0
+        -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.13.6</version>
+        </dependency>
+
+        <!--
             说明：springboot2.0以后默认使用lettuce作为操作redis的客户端，它使用netty进行网络通信
             lettuce的bug导致netty堆外内存溢出  netty如果没有指定堆外内存，默认使用-Xmx300m,可以通过-Dio.netty.maxDirectMemory进行设置
             解决方案：不能使用-Dio.netty.maxDirectMemory只去调大堆外内存

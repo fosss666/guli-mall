@@ -6,6 +6,7 @@ import com.fosss.gulimall.product.service.AttrGroupService;
 import com.fosss.gulimall.product.service.BrandService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.redisson.api.RedissonClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -28,6 +29,16 @@ public class GulimallProductApplicationTests {
     private AttrGroupService attrGroupService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private RedissonClient redissonClient;
+
+    /**
+     * 测试redisson
+     */
+    @Test
+    public void testRedisson() {
+        System.out.println(redissonClient);
+    }
 
     /**
      * 测试redis
