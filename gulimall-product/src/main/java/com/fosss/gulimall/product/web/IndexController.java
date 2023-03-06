@@ -5,10 +5,7 @@ import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.service.CategoryService;
 import com.fosss.gulimall.product.vo.Catelog2Vo;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RCountDownLatch;
-import org.redisson.api.RLock;
-import org.redisson.api.RReadWriteLock;
-import org.redisson.api.RedissonClient;
+import org.redisson.api.*;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +32,32 @@ public class IndexController {
     private RedissonClient redissonClient;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 测试信号量
+     * 车库停车
+     */
+    @ResponseBody
+    @GetMapping("/park")
+    public String park() throws InterruptedException {
+        RSemaphore park = redissonClient.getSemaphore("park");
+        //获取车位
+        //park.acquire();//阻塞等待，一直等到有车位才释放
+        boolean isSuccess = park.tryAcquire();//尝试获取，没有车位就返回false
+        if (isSuccess) {
+            return "成功停车";
+        }
+        return "车位已满";
+    }
+
+    @ResponseBody
+    @GetMapping("/go")
+    public String go() throws InterruptedException {
+        RSemaphore park = redissonClient.getSemaphore("park");
+        park.release();//释放车位
+
+        return "一辆车从车位离开";
+    }
 
     /**
      * 测试闭锁
