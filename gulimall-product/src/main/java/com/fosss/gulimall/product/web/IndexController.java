@@ -5,6 +5,7 @@ import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.service.CategoryService;
 import com.fosss.gulimall.product.vo.Catelog2Vo;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RCountDownLatch;
 import org.redisson.api.RLock;
 import org.redisson.api.RReadWriteLock;
 import org.redisson.api.RedissonClient;
@@ -12,6 +13,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
@@ -35,8 +37,34 @@ public class IndexController {
     private StringRedisTemplate stringRedisTemplate;
 
     /**
+     * 测试闭锁
+     */
+    @ResponseBody
+    @GetMapping("/lockDoor")
+    public String lockDoor() throws InterruptedException {
+        //获取闭锁
+        RCountDownLatch door = redissonClient.getCountDownLatch("door");
+        //设置数量
+        door.trySetCount(5);
+        //进行等待
+        door.await();
+
+        return "放假咯。。。";
+    }
+
+    @ResponseBody
+    @GetMapping("/gogogo/{id}")
+    public String gogogo(@PathVariable Long id) {
+        //数量减一
+        RCountDownLatch door = redissonClient.getCountDownLatch("door");
+        door.countDown();
+        return id + "班都走光了。";
+    }
+
+    /**
      * 测试读写锁
-     * 读写锁能够保证读到的数据一定是最新的，写锁是排他锁（互斥锁），多个写锁应排队进行，读锁是共享锁，能够同时读，写锁未释放，读锁就一直等待
+     * 读写锁能够保证读到的数据一定是最新的，写锁是排他锁（互斥锁），多个写锁应排队进行，读锁是共享锁，能够同时读，写锁未释放，读锁就一直等待。同
+     * 样，读锁未释放，也不能写
      */
     @ResponseBody
     @GetMapping("/write")
