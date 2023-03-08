@@ -50,8 +50,12 @@ spring:
         - id: gulimall_host_route
           uri: lb://gulimall-product #前台
           predicates:
-          - Host=**.localhost,localhost
+          - Host=localhost
 
+        - id: gulimall_search_route
+          uri: lb://gulimall-search #前台搜索页
+          predicates:
+          - Host=search.localhost
 
 
 
