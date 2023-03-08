@@ -19,6 +19,12 @@
     </properties>
     <dependencies>
 
+        <!--springCache-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
         <!--
             整合redisson分布式锁：
             1.导入依赖

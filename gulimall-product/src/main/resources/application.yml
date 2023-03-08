@@ -20,13 +20,14 @@ spring:
   redis:
     host: 192.168.113.128
     port: 6379
+  cache:
+    type: redis   #配置缓存类型
 mybatis-plus:
   global-config:
     db-config:
       id-type: auto
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
 
 
 
