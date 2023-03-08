@@ -8,6 +8,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
+ *
+ * 读多写少读数据直接用SpringCache,写数据可以加读写锁，读多写多直接查数据库
  * 配置spring-cache
  *
  * @Cacheable: Triggers cache population.触发器缓存填充
