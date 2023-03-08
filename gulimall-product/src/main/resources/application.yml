@@ -24,8 +24,9 @@ spring:
     type: redis   #配置缓存类型
     redis:
       time-to-live: 3600000   # 1小时
-      key-prefix: CACHE_
-
+#      use-key-prefix: true  #默认key使用前缀
+#      cache-null-values: true  #默认会缓存空值（解决缓存穿透）
+#      key-prefix: CACHE_     默认分区名为前缀
 mybatis-plus:
   global-config:
     db-config:

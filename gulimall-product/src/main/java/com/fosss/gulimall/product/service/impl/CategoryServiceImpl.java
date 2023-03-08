@@ -7,7 +7,9 @@ import com.fosss.common.constant.RedisConstant;
 import com.fosss.gulimall.product.service.CategoryBrandRelationService;
 import com.fosss.gulimall.product.vo.Catelog2Vo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -57,6 +59,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     /**
      * 修改,同时修改品牌分类关系表中的数据
      */
+    //@CacheEvict(cacheNames = "category", key = "'getLevel1'")//注意key如果是字符串应该用''引起来   //失效模式
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "category", key = "'getLevel1'"),
+            @CacheEvict(cacheNames = "category", key = "'getCatelogJson'")
+    })
     @Override
     @Transactional
     public void updateDetails(CategoryEntity category) {
@@ -133,6 +140,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * 2.为缓存设置不同的过期时间：解决缓存雪崩问题（缓存同时过期）
      * 3.加锁：解决缓存击穿问题（热点数据在缓存过期后被大量访问）
      */
+    @Cacheable(cacheNames = "category", key = "#root.methodName")
     @Override
     public Map<String, List<Catelog2Vo>> getCatelogJson() {
         ValueOperations<String, String> ops = stringRelationService.opsForValue();
@@ -160,6 +168,33 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         });
         return stringListMap;
     }
+    /*@Override
+    public Map<String, List<Catelog2Vo>> getCatelogJson() {
+        ValueOperations<String, String> ops = stringRelationService.opsForValue();
+        String categoryJson = ops.get(RedisConstant.PRODUCT_CATEGORY_KEY);
+        if (StringUtils.isEmpty(categoryJson)) {
+            //缓存中没有数据，则从数据库中查询
+            Map<String, List<Catelog2Vo>> listMap = getCatelog();
+            //存入缓存
+            //解决缓存1问题
+            if (listMap == null || listMap.size() == 0) {
+                //缓存空数据
+                ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, "null", RedisConstant.CACHE_NULL_TIME, TimeUnit.SECONDS);
+            } else {
+                String s = JSON.toJSONString(listMap);
+                ops.set(RedisConstant.PRODUCT_CATEGORY_KEY, s, CACHE_OTHER_TIME, TimeUnit.SECONDS);
+            }
+            //返回数据
+            return listMap;
+        }
+        //缓存中有数据，则取出并转为所需类型并返回
+        if (categoryJson.equals("null")) {
+            return Collections.emptyMap();
+        }
+        Map<String, List<Catelog2Vo>> stringListMap = JSON.parseObject(categoryJson, new TypeReference<Map<String, List<Catelog2Vo>>>() {
+        });
+        return stringListMap;
+    }*/
 
     /**
      * 分布式锁解决缓存击穿，分布式项目应采用
