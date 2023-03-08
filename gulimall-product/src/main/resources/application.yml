@@ -24,6 +24,8 @@ spring:
     type: redis   #配置缓存类型
     redis:
       time-to-live: 3600000   # 1小时
+      key-prefix: CACHE_
+
 mybatis-plus:
   global-config:
     db-config:

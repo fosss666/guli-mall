@@ -27,7 +27,6 @@ import org.springframework.context.annotation.ComponentScan;
  * 4.在需要缓存的方法上添加相应注解
  */
 
-@EnableCaching //开启缓存
 @EnableDiscoveryClient//开启注册中心
 @SpringBootApplication
 @ComponentScan(basePackages = "com.fosss")
