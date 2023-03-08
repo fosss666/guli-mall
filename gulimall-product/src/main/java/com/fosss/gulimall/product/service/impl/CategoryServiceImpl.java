@@ -116,8 +116,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     /**
      * 查询一级分类
+     * 缓存自定义 1.key  2.缓存时间 （配置文件中指定）  3.缓存值格式（json,默认是序列化后的值）
      */
-    @Cacheable({"category"})
+    @Cacheable(cacheNames = {"category"}, key = "#root.methodName")//将返回数据缓存起来
     @Override
     public List<CategoryEntity> getLevel1() {
         log.info("从数据库中查询了一级分类");
