@@ -1,12 +1,7 @@
 package com.fosss.gulimall.search.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import javax.naming.directory.SearchResult;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author: fosss
@@ -16,9 +11,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 public class SearchController {
-    @GetMapping(value = "/search.html")
+    @GetMapping(value = "/list.html")
     public String listPage() {
 
-        return "search";
+        return "list";
     }
 }
