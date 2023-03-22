@@ -11,7 +11,9 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.rescore.RescorerBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -126,9 +128,31 @@ public class MallSearchServiceImpl implements MallSearchService {
         searchSourceBuilder.query(boolQueryBuilder);
 
 
-        //排序、高亮、分页
+        /**
+         * 排序、高亮、分页
+         */
+        //排序
+        if (!StringUtils.isEmpty(param.getSort())) {
+            String[] s = param.getSort().split("_");
+            SortOrder order = "asc".equals(s[1]) ? SortOrder.ASC : SortOrder.DESC;
+            searchSourceBuilder.sort(s[0], order);
+        }
+        //高亮
+        if (!StringUtils.isEmpty(param.getKeyword())) {
+            HighlightBuilder builder = new HighlightBuilder();
+            builder.field("sukTitle");
+            builder.preTags("<b style='color:red'>");
+            builder.postTags("<b/>");
+            searchSourceBuilder.highlighter(builder);
+        }
+        //分页
+        searchSourceBuilder.from((param.getPageNum() - 1) * EsConstant.PRODUCT_PAGE_SIZE);
+        searchSourceBuilder.size(EsConstant.PRODUCT_PAGE_SIZE);
 
-        //聚合分析
+        /**
+         * 聚合分析
+         */
+
 
         //构建检索请求
         SearchRequest searchRequest = new SearchRequest(new String[]{EsConstant.PRODUCT_INDEX}, searchSourceBuilder);
