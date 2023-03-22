@@ -5,11 +5,15 @@ import com.fosss.gulimall.search.constant.EsConstant;
 import com.fosss.gulimall.search.service.MallSearchService;
 import com.fosss.gulimall.search.vo.SearchParam;
 import com.fosss.gulimall.search.vo.SearchResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.rescore.RescorerBuilder;
@@ -25,6 +29,7 @@ import java.io.IOException;
  * Time: 19:45
  * Description:
  */
+@Slf4j
 @Service
 public class MallSearchServiceImpl implements MallSearchService {
 
@@ -152,7 +157,40 @@ public class MallSearchServiceImpl implements MallSearchService {
         /**
          * 聚合分析
          */
+        //1. 按照品牌进行聚合
+        TermsAggregationBuilder brand_agg = AggregationBuilders.terms("brand_agg");
+        brand_agg.field("brandId").size(50);
 
+
+        //1.1 品牌的子聚合-品牌名聚合
+        brand_agg.subAggregation(AggregationBuilders.terms("brand_name_agg")
+                .field("brandName").size(1));
+        //1.2 品牌的子聚合-品牌图片聚合
+        brand_agg.subAggregation(AggregationBuilders.terms("brand_img_agg")
+                .field("brandImg").size(1));
+
+        searchSourceBuilder.aggregation(brand_agg);
+
+        //2. 按照分类信息进行聚合
+        TermsAggregationBuilder catalog_agg = AggregationBuilders.terms("catalog_agg");
+        catalog_agg.field("catalogId").size(20);
+
+        catalog_agg.subAggregation(AggregationBuilders.terms("catalog_name_agg").field("catalogName").size(1));
+
+        searchSourceBuilder.aggregation(catalog_agg);
+
+        //2. 按照属性信息进行聚合
+        NestedAggregationBuilder attr_agg = AggregationBuilders.nested("attr_agg", "attrs");
+        //2.1 按照属性ID进行聚合
+        TermsAggregationBuilder attr_id_agg = AggregationBuilders.terms("attr_id_agg").field("attrs.attrId");
+        attr_agg.subAggregation(attr_id_agg);
+        //2.1.1 在每个属性ID下，按照属性名进行聚合
+        attr_id_agg.subAggregation(AggregationBuilders.terms("attr_name_agg").field("attrs.attrName").size(1));
+        //2.1.1 在每个属性ID下，按照属性值进行聚合
+        attr_id_agg.subAggregation(AggregationBuilders.terms("attr_value_agg").field("attrs.attrValue").size(50));
+        searchSourceBuilder.aggregation(attr_agg);
+
+        log.debug("构建的DSL语句 {}", searchSourceBuilder.toString());
 
         //构建检索请求
         SearchRequest searchRequest = new SearchRequest(new String[]{EsConstant.PRODUCT_INDEX}, searchSourceBuilder);
