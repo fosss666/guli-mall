@@ -31,10 +31,13 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +50,7 @@ import java.util.stream.Collectors;
 @Service
 public class MallSearchServiceImpl implements MallSearchService {
 
+    @Resource
     private RestHighLevelClient client;
 
     /**
@@ -321,46 +325,30 @@ public class MallSearchServiceImpl implements MallSearchService {
                 (int) total / EsConstant.PRODUCT_PAGE_SIZE : ((int) total / EsConstant.PRODUCT_PAGE_SIZE + 1);
         result.setTotalPages(totalPages);
 
-        //List<Integer> pageNavs = new ArrayList<>();
-        //for (int i = 1; i <= totalPages; i++) {
-        //    pageNavs.add(i);
-        //}
-        //result.setPageNavs(pageNavs);
-
-
         //6、构建面包屑导航
-        //if (param.getAttrs() != null && param.getAttrs().size() > 0) {
-        //    List<SearchResult.NavVo> collect = param.getAttrs().stream().map(attr -> {
-        //        //1、分析每一个attrs传过来的参数值
-        //        SearchResult.NavVo navVo = new SearchResult.NavVo();
-        //        String[] s = attr.split("_");
-        //        navVo.setNavValue(s[1]);
-        //        R r = productFeignService.attrInfo(Long.parseLong(s[0]));
-        //        if (r.getCode() == 0) {
-        //            AttrResponseVo data = r.getData("attr", new TypeReference<AttrResponseVo>() {
-        //            });
-        //            navVo.setNavName(data.getAttrName());
-        //        } else {
-        //            navVo.setNavName(s[0]);
-        //        }
-        //
-        //        //2、取消了这个面包屑以后，我们要跳转到哪个地方，将请求的地址url里面的当前置空
-        //        //拿到所有的查询条件，去掉当前
-        //        String encode = null;
-        //        try {
-        //            encode = URLEncoder.encode(attr, "UTF-8");
-        //            encode.replace("+", "%20");  //浏览器对空格的编码和Java不一样，差异化处理
-        //        } catch (UnsupportedEncodingException e) {
-        //            e.printStackTrace();
-        //        }
-        //        String replace = param.get_queryString().replace("&attrs=" + attr, "");
-        //        navVo.setLink("http://search.gulimall.com/list.html?" + replace);
-        //
-        //        return navVo;
-        //    }).collect(Collectors.toList());
-        //
-        //    result.setNavs(collect);
-        //}
+        //将属性id和属性名称存到map中
+        Map<String, String> attrMap = attrVos.stream().collect(Collectors.toMap(k -> k.getAttrId().toString(), v -> v.getAttrName()));
+        if (param.getAttrs() != null && param.getAttrs().size() > 0) {
+            List<SearchResult.NavVo> collect = param.getAttrs().stream().map(attr -> {
+                SearchResult.NavVo navVo = new SearchResult.NavVo();
+                //2_5寸:10寸
+                String[] s = attr.split("_");
+                navVo.setNavValue(s[1]);
+                navVo.setNavName(attrMap.get(s[0]));
+                //取消了这个面包屑以后，我们要跳转到哪个地方，将请求的地址url里面的当前置空
+                //拿到所有的查询条件，去掉当前的查询条件
+                String encode = null;
+                try {
+                    encode = URLEncoder.encode(attr, "UTF-8");
+                    encode.replace("+", "%20");  //浏览器对空格的编码和Java不一样，差异化处理
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                String replace = param.get_queryString().replace("&attrs=" + attr, "");
+                navVo.setLink("http://search.localhost/list.html?" + replace);
+                return navVo;
+            }).collect(Collectors.toList());
+        }
 
         return result;
     }

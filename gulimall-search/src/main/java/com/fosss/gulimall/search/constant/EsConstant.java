@@ -7,7 +7,7 @@ package com.fosss.gulimall.search.constant;
  */
 public class EsConstant {
     //商品上架时保存在es中的索引
-    public static final String PRODUCT_INDEX = "gulimall_product";
+    public static final String PRODUCT_INDEX = "product";
     //检索时每页大小
     public static final Integer PRODUCT_PAGE_SIZE = 16;
     //聚合显示个数

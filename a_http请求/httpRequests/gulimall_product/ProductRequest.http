@@ -9,7 +9,7 @@ Content-Type: application/json
         "type": "long"
       },
       "spuId": {
-        "type": "keyword"
+        "type": "long"
       },
       "skuTitle": {
         "type": "text",
@@ -24,7 +24,7 @@ Content-Type: application/json
       "saleCount": {
         "type": "long"
       },
-      "hasStock": {
+      "hosStock": {
         "type": "boolean"
       },
       "hotScore": {
@@ -33,7 +33,7 @@ Content-Type: application/json
       "brandId": {
         "type": "long"
       },
-      "catalogId": {
+      "catelogId": {
         "type": "long"
       },
       "brandName": {
