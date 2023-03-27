@@ -24,8 +24,17 @@ public class CompletableFutureTest {
         //启动线程任务-supplyAsync   有返回值
         CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
             System.out.println("当前线程：" + Thread.currentThread().getId());
-            return 666;
-        }, service);
+            int res = 666 / 0;
+            return res;
+        }, service).whenCompleteAsync((res, exception) -> {
+            //该方法能够获得结果和感知异常
+            System.out.println("打印结果：" + res + " 抛出异常：" + exception);
+        }, service).exceptionally((e) -> {
+            //该方法能够感知异常并返回默认结果
+            System.out.println("异常：" + e);
+            return 6;
+        });
+
         System.out.println("返回值" + future.get());
     }
 }
