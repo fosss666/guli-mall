@@ -33,7 +33,11 @@ public class CompletableFutureTest {
             //该方法能够感知异常并返回默认结果
             System.out.println("异常：" + e);
             return 6;
-        });
+        }).handleAsync((res, exception) -> {
+            //该方法能够获得结果、感知异常、返回结果，相当于whenCompleteAsync + exceptionally
+            System.out.println("结果：" + res + " 异常：" + exception);
+            return 66;
+        }, service);
 
         System.out.println("返回值" + future.get());
     }
