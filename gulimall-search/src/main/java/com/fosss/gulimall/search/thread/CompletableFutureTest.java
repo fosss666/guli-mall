@@ -66,16 +66,45 @@ public class CompletableFutureTest {
         //}, service);
 
         //3
-        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
-            System.out.println("当前线程：" + Thread.currentThread().getId());
-            int res = 10 / 2;
-            return res;
-        }, service).thenApplyAsync((res) -> {
-            //thenApplyAsync 可以获得结果，有返回值
-            System.out.println("线程2启动了,结果为：" + res);
-            return res;
+        //CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+        //    System.out.println("当前线程：" + Thread.currentThread().getId());
+        //    int res = 10 / 2;
+        //    return res;
+        //}, service).thenApplyAsync((res) -> {
+        //    //thenApplyAsync 可以获得结果，有返回值
+        //    System.out.println("线程2启动了,结果为：" + res);
+        //    return res;
+        //}, service);
+        //System.out.println("返回：" + future.get());
+
+        /**
+         * 两任务组合-都完成后再执行线程3
+         */
+        CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("线程1:" + Thread.currentThread().getId());
+            return 1;
         }, service);
-        System.out.println("返回：" + future.get());
+
+        CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("线程2:" + Thread.currentThread().getId());
+            return "呵呵";
+        }, service);
+
+        //future01.runAfterBoth(future02,()->{
+        //    System.out.println("线程3："+Thread.currentThread().getId());
+        //});
+
+        //future01.thenAcceptBothAsync(future02,(f1,f2)->{
+        //    System.out.println("线程1返回："+f1+" 线程2返回："+f2);
+        //    System.out.println("线程3："+Thread.currentThread().getId());
+        //},service);
+
+        CompletableFuture<String> future03 = future01.thenCombineAsync(future02, (f1, f2) -> {
+            System.out.println("线程1返回：" + f1 + " 线程2返回：" + f2);
+            System.out.println("线程3：" + Thread.currentThread().getId());
+            return f1 + "->" + f2;
+        }, service);
+        System.out.println("线程3返回：" + future03.get());
     }
 }
 
