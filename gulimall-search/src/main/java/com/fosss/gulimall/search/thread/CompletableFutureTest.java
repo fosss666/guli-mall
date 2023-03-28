@@ -80,12 +80,12 @@ public class CompletableFutureTest {
         /**
          * 两任务组合-都完成后再执行线程3
          */
-        CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {
+        CompletableFuture<Object> future01 = CompletableFuture.supplyAsync(() -> {
             System.out.println("线程1:" + Thread.currentThread().getId());
             return 1;
         }, service);
 
-        CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {
+        CompletableFuture<Object> future02 = CompletableFuture.supplyAsync(() -> {
             System.out.println("线程2:" + Thread.currentThread().getId());
             return "呵呵";
         }, service);
@@ -99,12 +99,33 @@ public class CompletableFutureTest {
         //    System.out.println("线程3："+Thread.currentThread().getId());
         //},service);
 
-        CompletableFuture<String> future03 = future01.thenCombineAsync(future02, (f1, f2) -> {
-            System.out.println("线程1返回：" + f1 + " 线程2返回：" + f2);
-            System.out.println("线程3：" + Thread.currentThread().getId());
-            return f1 + "->" + f2;
-        }, service);
-        System.out.println("线程3返回：" + future03.get());
+        //CompletableFuture<String> future03 = future01.thenCombineAsync(future02, (f1, f2) -> {
+        //    System.out.println("线程1返回：" + f1 + " 线程2返回：" + f2);
+        //    System.out.println("线程3：" + Thread.currentThread().getId());
+        //    return f1 + "->" + f2;
+        //}, service);
+        //System.out.println("线程3返回：" + future03.get());
+
+        /**
+         * 两任务组合-一个完成后就能执行线程3
+         */
+        //future01.runAfterEitherAsync(future02, () -> {
+        //    System.out.println("线程3：" + Thread.currentThread().getId());
+        //}, service);
+        //
+        //future01.acceptEitherAsync(future02, (res) -> {
+        //    System.out.println("任务3开始之前的返回的结果" + res);
+        //    System.out.println("线程3：" + Thread.currentThread().getId());
+        //}, service);
+        //
+        //CompletableFuture<Object> future03 = future01.applyToEitherAsync(future02, (res) -> {
+        //    System.out.println("任务3开始之前的返回的结果" + res);
+        //    System.out.println("线程3：" + Thread.currentThread().getId());
+        //    return res;
+        //}, service);
+        //System.out.println("线程3返回：" + future03.get());
+
+
     }
 }
 
