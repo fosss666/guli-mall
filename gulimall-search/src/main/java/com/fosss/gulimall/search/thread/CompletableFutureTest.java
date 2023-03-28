@@ -125,7 +125,16 @@ public class CompletableFutureTest {
         //}, service);
         //System.out.println("线程3返回：" + future03.get());
 
+        /**
+         * 多任务组合
+         */
+        //1.等待所有任务执行完成之后
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(future01, future02);
+        allOf.get();
 
+        //2.任一个任务执行完
+        CompletableFuture<Object> anyOf = CompletableFuture.anyOf(future01, future02);
+        anyOf.get();
     }
 }
 
