@@ -1,8 +1,15 @@
 package com.fosss.gulimall.product.service.impl;
 
+import com.fosss.gulimall.product.entity.SkuImagesEntity;
+import com.fosss.gulimall.product.entity.SpuInfoDescEntity;
+import com.fosss.gulimall.product.vo.SeckillSkuVo;
+import com.fosss.gulimall.product.vo.SkuItemSaleAttrVo;
+import com.fosss.gulimall.product.vo.SkuItemVo;
+import com.fosss.gulimall.product.vo.SpuItemAttrGroupVo;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -89,6 +96,25 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    /**
+     * 查询该商品详情
+     */
+    @Override
+    public SkuItemVo item(Long skuId) {
+        //1、sku基本信息的获取  pms_sku_info
+
+        //2、sku的图片信息    pms_sku_images
+
+        //3、获取spu的销售属性组合
+
+        //4、获取spu的介绍
+
+        //5、获取spu的规格参数信息
+
+        //6、秒杀商品的优惠信息
+        return null;
     }
 
 }

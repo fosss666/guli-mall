@@ -3,6 +3,7 @@ package com.fosss.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fosss.common.utils.PageUtils;
 import com.fosss.gulimall.product.entity.SkuInfoEntity;
+import com.fosss.gulimall.product.vo.SkuItemVo;
 
 import java.util.Map;
 
@@ -20,5 +21,10 @@ public interface SkuInfoService extends IService<SkuInfoEntity> {
      * sku检索
      */
     PageUtils listByConditions(Map<String, Object> params);
+
+    /**
+     * 查询该商品详情
+     */
+    SkuItemVo item(Long skuId);
 }
 
