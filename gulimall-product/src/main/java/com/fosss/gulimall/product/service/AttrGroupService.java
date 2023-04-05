@@ -7,6 +7,7 @@ import com.fosss.gulimall.product.entity.AttrGroupEntity;
 import com.fosss.gulimall.product.entity.CategoryEntity;
 import com.fosss.gulimall.product.vo.AttrGroupRelationVo;
 import com.fosss.gulimall.product.vo.AttrGroupWithAttrsVo;
+import com.fosss.gulimall.product.vo.SpuItemAttrGroupVo;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -52,12 +53,16 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     PageUtils getNotRelation(Long attrgroupId, Map<String, Object> params);
     /**
      * 添加属性与分组关联关系
-     * @param attrGroupRelationVos
      */
     void addRelation(List<AttrGroupRelationVo> attrGroupRelationVos);
     /**
      * 获取分类下所有分组及其属性
      */
     List<AttrGroupWithAttrsVo> getGroupAndAttrByCatelogId(Long catelogId);
+
+    /**
+     * 获取spu的规格参数信息
+     */
+    List<SpuItemAttrGroupVo> getSpuItemAttrGroup(Long spuId, Long catalogId);
 }
 

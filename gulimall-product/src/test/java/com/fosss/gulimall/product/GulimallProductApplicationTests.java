@@ -1,9 +1,11 @@
 package com.fosss.gulimall.product;
 
+import com.fosss.gulimall.product.dao.AttrGroupDao;
 import com.fosss.gulimall.product.entity.AttrGroupEntity;
 import com.fosss.gulimall.product.entity.BrandEntity;
 import com.fosss.gulimall.product.service.AttrGroupService;
 import com.fosss.gulimall.product.service.BrandService;
+import com.fosss.gulimall.product.vo.SpuItemAttrGroupVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.redisson.api.RedissonClient;
@@ -31,6 +33,14 @@ public class GulimallProductApplicationTests {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private RedissonClient redissonClient;
+    @Resource
+    private AttrGroupDao attrGroupDao;
+
+    @Test
+    public void testGetSpuItemAttrGroup() {
+        List<SpuItemAttrGroupVo> spuItemAttrGroup = attrGroupDao.getSpuItemAttrGroup(13L, 225L);
+        System.out.println(spuItemAttrGroup);
+    }
 
     /**
      * 测试redisson

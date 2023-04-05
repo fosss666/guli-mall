@@ -17,6 +17,7 @@ import com.fosss.gulimall.product.service.AttrGroupService;
 import com.fosss.gulimall.product.service.AttrService;
 import com.fosss.gulimall.product.vo.AttrGroupRelationVo;
 import com.fosss.gulimall.product.vo.AttrGroupWithAttrsVo;
+import com.fosss.gulimall.product.vo.SpuItemAttrGroupVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -253,6 +254,14 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             res.add(attrGroupWithAttrsVo);
         }
         return res;
+    }
+
+    /**
+     * 获取spu的规格参数信息
+     */
+    @Override
+    public List<SpuItemAttrGroupVo> getSpuItemAttrGroup(Long spuId, Long catalogId) {
+        return baseMapper.getSpuItemAttrGroup(spuId, catalogId);
     }
 
 }

@@ -2,6 +2,8 @@ package com.fosss.gulimall.product.service.impl;
 
 import com.fosss.gulimall.product.entity.SkuImagesEntity;
 import com.fosss.gulimall.product.entity.SpuInfoDescEntity;
+import com.fosss.gulimall.product.entity.SpuInfoEntity;
+import com.fosss.gulimall.product.service.*;
 import com.fosss.gulimall.product.vo.SeckillSkuVo;
 import com.fosss.gulimall.product.vo.SkuItemSaleAttrVo;
 import com.fosss.gulimall.product.vo.SkuItemVo;
@@ -20,12 +22,20 @@ import com.fosss.common.utils.Query;
 
 import com.fosss.gulimall.product.dao.SkuInfoDao;
 import com.fosss.gulimall.product.entity.SkuInfoEntity;
-import com.fosss.gulimall.product.service.SkuInfoService;
 import org.springframework.util.StringUtils;
+
+import javax.annotation.Resource;
 
 
 @Service("skuInfoService")
 public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> implements SkuInfoService {
+
+    @Resource
+    private SkuImagesService skuImagesService;
+    @Resource
+    private SpuInfoDescService spuInfoDescService;
+    @Resource
+    private AttrGroupService attrGroupService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -103,18 +113,52 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
      */
     @Override
     public SkuItemVo item(Long skuId) {
+        SkuItemVo skuItemVo = new SkuItemVo();
+
         //1、sku基本信息的获取  pms_sku_info
+        SkuInfoEntity info = getById(skuId);
+        skuItemVo.setInfo(info);
 
         //2、sku的图片信息    pms_sku_images
+        List<SkuImagesEntity> images = skuImagesService.getSkuImagesBySkuId(skuId);
+        skuItemVo.setImages(images);
 
         //3、获取spu的销售属性组合
 
         //4、获取spu的介绍
+        Long spuId = info.getSpuId();
+        SpuInfoDescEntity desc = spuInfoDescService.getById(spuId);
+        skuItemVo.setDesc(desc);
 
         //5、获取spu的规格参数信息
+        Long catalogId = info.getCatalogId();
+        List<SpuItemAttrGroupVo> groupAttrs = attrGroupService.getSpuItemAttrGroup(spuId, catalogId);
+        skuItemVo.setGroupAttrs(groupAttrs);
 
         //6、秒杀商品的优惠信息
+
         return null;
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
