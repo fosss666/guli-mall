@@ -1,10 +1,12 @@
 package com.fosss.gulimall.product;
 
 import com.fosss.gulimall.product.dao.AttrGroupDao;
+import com.fosss.gulimall.product.dao.SkuSaleAttrValueDao;
 import com.fosss.gulimall.product.entity.AttrGroupEntity;
 import com.fosss.gulimall.product.entity.BrandEntity;
 import com.fosss.gulimall.product.service.AttrGroupService;
 import com.fosss.gulimall.product.service.BrandService;
+import com.fosss.gulimall.product.vo.SkuItemSaleAttrVo;
 import com.fosss.gulimall.product.vo.SpuItemAttrGroupVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +37,14 @@ public class GulimallProductApplicationTests {
     private RedissonClient redissonClient;
     @Resource
     private AttrGroupDao attrGroupDao;
+    @Resource
+    private SkuSaleAttrValueDao skuSaleAttrValueDao;
+
+    @Test
+    public void testGetSkuSaleAttrBySpuId() {
+        List<SkuItemSaleAttrVo> skuItemSaleAttrVos = skuSaleAttrValueDao.getSkuSaleAttrBySpuId(13L);
+        System.out.println(skuItemSaleAttrVos);
+    }
 
     @Test
     public void testGetSpuItemAttrGroup() {

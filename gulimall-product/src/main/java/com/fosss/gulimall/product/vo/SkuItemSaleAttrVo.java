@@ -18,5 +18,5 @@ public class SkuItemSaleAttrVo {
 
     private String attrName;
 
-    private List<AttrValueWithSkuIdVo> attrValues;
+    private String attrValues;
 }
