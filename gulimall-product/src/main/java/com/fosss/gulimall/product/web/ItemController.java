@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.annotation.Resource;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author: fosss
@@ -28,7 +29,7 @@ public class ItemController {
      * 查询该商品详情，并跳转到商品详情页
      */
     @GetMapping("/{skuId}.html")
-    public String skuItem(@PathVariable Long skuId, Model model) {
+    public String skuItem(@PathVariable Long skuId, Model model) throws ExecutionException, InterruptedException {
         log.info("查询商品详情，商品skuId为：" + skuId);
         SkuItemVo item = skuInfoService.item(skuId);
         //System.out.println(item.getSaleAttr().get(1).getAttrName());

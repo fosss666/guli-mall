@@ -6,6 +6,7 @@ import com.fosss.gulimall.product.entity.SkuInfoEntity;
 import com.fosss.gulimall.product.vo.SkuItemVo;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * sku信息
@@ -25,6 +26,6 @@ public interface SkuInfoService extends IService<SkuInfoEntity> {
     /**
      * 查询该商品详情
      */
-    SkuItemVo item(Long skuId);
+    SkuItemVo item(Long skuId) throws ExecutionException, InterruptedException;
 }
 
