@@ -31,7 +31,9 @@ public class ItemController {
     public String skuItem(@PathVariable Long skuId, Model model) {
         log.info("查询商品详情，商品skuId为：" + skuId);
         SkuItemVo item = skuInfoService.item(skuId);
-        model.addAttribute("info", item);
+        //System.out.println(item.getSaleAttr().get(1).getAttrName());
+        //System.out.println(item.getSaleAttr().get(1).getAttrValues());
+        model.addAttribute("item", item);
         return "item";
     }
 }

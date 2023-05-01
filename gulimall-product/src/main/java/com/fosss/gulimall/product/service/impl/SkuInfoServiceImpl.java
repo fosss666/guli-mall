@@ -141,7 +141,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
         //6、秒杀商品的优惠信息
 
-        return null;
+        return skuItemVo;
     }
 
 }
