@@ -57,6 +57,10 @@ spring:
           predicates:
           - Host=search.localhost
 
+        - id: gulimall_auth_server
+          uri: lb://gulimall-auth-server #登录页面
+          predicates:
+          - Host=auth.localhost
 
 
 
