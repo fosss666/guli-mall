@@ -12,15 +12,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class LoginController {
 
-    @GetMapping("/login.html")
-    public String login() {
-        return "login";
-    }
-
-    @GetMapping("/reg.html")
-    public String register() {
-        return "reg";
-    }
+    /**
+     * 用springmvc的视图跳转配置来替代
+     */
+    //@GetMapping("/login.html")
+    //public String login() {
+    //    return "login";
+    //}
+    //
+    //@GetMapping("/reg.html")
+    //public String register() {
+    //    return "reg";
+    //}
 }
 
 
