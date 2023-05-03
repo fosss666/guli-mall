@@ -12,7 +12,17 @@ spring:
 
   application:
     name: gulimall-third-party
-
+  redis:
+    host: 192.168.113.128
+    port: 6379
+  cache:
+    type: redis   #配置缓存类型
+    redis:
+      time-to-live: 3600000   # 1小时
+  mail: #邮箱服务
+    host: smtp.qq.com
+    username: 1745179058@qq.com
+    password:
 server:
   port: 30000
 
