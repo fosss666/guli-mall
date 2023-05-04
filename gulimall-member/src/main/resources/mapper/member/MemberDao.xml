@@ -24,6 +24,28 @@
         <result property="status" column="status"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
+    <!--查询username的个数-->
+    <select id="selectUsernameCount" resultType="java.lang.Integer">
+        select count(*)
+        from gulimall_ums.ums_member
+        where username = #{userName}
+    </select>
 
 
 </mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

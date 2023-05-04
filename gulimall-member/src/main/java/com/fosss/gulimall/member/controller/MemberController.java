@@ -35,7 +35,12 @@ public class MemberController {
      */
     @PostMapping("/register")
     public R register(@RequestBody UserRegisterVo userRegisterVo) {
-        return memberService.register(userRegisterVo);
+        try {
+            memberService.register(userRegisterVo);
+            return R.ok();
+        }catch (Exception e) {
+            return R.error();
+        }
     }
 
     /**

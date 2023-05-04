@@ -1,8 +1,10 @@
 package com.fosss.gulimall.member.service.impl;
 
-import com.fosss.common.utils.R;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fosss.gulimall.member.dao.MemberLevelDao;
 import com.fosss.gulimall.member.entity.MemberLevelEntity;
+import com.fosss.gulimall.member.exception.PhoneUniqueException;
+import com.fosss.gulimall.member.exception.UsernameUniqueException;
 import com.fosss.gulimall.member.vo.UserRegisterVo;
 import org.springframework.stereotype.Service;
 
@@ -41,20 +43,27 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
      * 检查用户名是否唯一
      */
     @Override
-    public boolean checkUsernameUnique(String userName) {
-        return false;
+    public void checkUsernameUnique(String userName) {
+        //查询username的个数
+        int count = baseMapper.selectUsernameCount(userName);
+        if (count > 0) {
+            throw new UsernameUniqueException("用户名已存在");
+        }
     }
 
     /**
      * 检查手机号是否唯一
      */
     @Override
-    public boolean checkPasswordUnique(String password) {
-        return false;
+    public void checkPhoneUnique(String phone) {
+        Integer count = baseMapper.selectCount(new LambdaQueryWrapper<MemberEntity>().eq(MemberEntity::getEmail, phone));
+        if (count > 0) {
+            throw new PhoneUniqueException("手机号已注册");
+        }
     }
 
     @Override
-    public R register(UserRegisterVo userRegisterVo) {
+    public void register(UserRegisterVo userRegisterVo) {
         MemberEntity memberEntity = new MemberEntity();
         //1.设置默认会员等级
         //查询默认等级
@@ -63,10 +72,33 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 
         //2.设置用户名和手机号
         //检查用户名是否唯一
-        boolean usernameUnique = checkUsernameUnique(userRegisterVo.getUserName());
-
+        checkUsernameUnique(userRegisterVo.getUserName());
         //检查手机号是否唯一
-        boolean passwordUnique = checkPasswordUnique(userRegisterVo.getPassword());
+        checkPhoneUnique(userRegisterVo.getPhone());
+        //设置用户名和手机号
+        memberEntity.setUsername(userRegisterVo.getUserName());
+        memberEntity.setEmail(userRegisterVo.getPhone());
+
+        //3.设置密码，需要进行加密存储
+
+
+        baseMapper.insert(memberEntity);
+
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

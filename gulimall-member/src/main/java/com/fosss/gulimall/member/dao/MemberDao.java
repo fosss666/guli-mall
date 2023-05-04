@@ -3,6 +3,7 @@ package com.fosss.gulimall.member.dao;
 import com.fosss.gulimall.member.entity.MemberEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 会员
@@ -13,5 +14,8 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface MemberDao extends BaseMapper<MemberEntity> {
-	
+    /**
+     * 查询username的个数
+     */
+    int selectUsernameCount(@Param("userName") String userName);
 }
