@@ -1,9 +1,13 @@
 package com.fosss.gulimall.authserver.controller;
 
+import com.fosss.common.constant.AuthServerConstant;
 import com.fosss.common.utils.R;
+import com.fosss.gulimall.authserver.feign.MemberFeignService;
 import com.fosss.gulimall.authserver.feign.SmsSendFeign;
 import com.fosss.gulimall.authserver.vo.UserRegisterVo;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.fosss.common.constant.AuthServerConstant.SMS_CODE_CACHE_PREFIX;
+
 /**
  * @author: fosss
  * Date: 2023/5/2
@@ -29,9 +35,12 @@ public class LoginController {
 
     @Resource
     private SmsSendFeign smsSendFeign;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private MemberFeignService memberFeignService;
 
     /**
-     *
      * TODO: 重定向携带数据：利用session原理，将数据放在session中。
      * TODO:只要跳转到下一个页面取出这个数据以后，session里面的数据就会删掉
      * TODO：分布下session问题
@@ -45,24 +54,22 @@ public class LoginController {
         //如果有错误回到注册页面
         if (result.hasErrors()) {
             Map<String, String> errors = result.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-            attributes.addFlashAttribute("errors",errors);
+            attributes.addFlashAttribute("errors", errors);
 
             //效验出错回到注册页面
             return "redirect:http://auth.localhost/login.html";
         }
 
-        return "redirect:http://auth.localhost/reg.html";
-/*
         //1、效验验证码
         String code = vos.getCode();
 
         //获取存入Redis里的验证码
-        String redisCode = stringRedisTemplate.opsForValue().get(AuthServerConstant.SMS_CODE_CACHE_PREFIX + vos.getPhone());
+        String redisCode = stringRedisTemplate.opsForValue().get(SMS_CODE_CACHE_PREFIX + vos.getPhone());
         if (!StringUtils.isEmpty(redisCode)) {
             //截取字符串
-            if (code.equals(redisCode.split("_")[0])) {
+            if (code.equals(redisCode)) {
                 //删除验证码;令牌机制
-                stringRedisTemplate.delete(AuthServerConstant.SMS_CODE_CACHE_PREFIX+vos.getPhone());
+                stringRedisTemplate.delete(SMS_CODE_CACHE_PREFIX + vos.getPhone());
                 //验证码通过，真正注册，调用远程服务进行注册
                 R register = memberFeignService.register(vos);
                 if (register.getCode() == 0) {
@@ -71,8 +78,8 @@ public class LoginController {
                 } else {
                     //失败
                     Map<String, String> errors = new HashMap<>();
-                    errors.put("msg", register.getData("msg",new TypeReference<String>(){}));
-                    attributes.addFlashAttribute("errors",errors);
+                    errors.put("msg", "注册失败");
+                    attributes.addFlashAttribute("errors", errors);
                     return "redirect:http://auth.localhost/reg.html";
                 }
 
@@ -80,17 +87,17 @@ public class LoginController {
             } else {
                 //效验出错回到注册页面
                 Map<String, String> errors = new HashMap<>();
-                errors.put("code","验证码错误");
-                attributes.addFlashAttribute("errors",errors);
+                errors.put("code", "验证码错误");
+                attributes.addFlashAttribute("errors", errors);
                 return "redirect:http://auth.localhost/reg.html";
             }
         } else {
             //效验出错回到注册页面
             Map<String, String> errors = new HashMap<>();
-            errors.put("code","验证码错误");
-            attributes.addFlashAttribute("errors",errors);
+            errors.put("code", "验证码错误");
+            attributes.addFlashAttribute("errors", errors);
             return "redirect:http://auth.localhost/reg.html";
-        }*/
+        }
     }
 
     /**

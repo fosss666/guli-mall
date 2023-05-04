@@ -2,7 +2,9 @@ package com.fosss.gulimall.member.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fosss.common.utils.PageUtils;
+import com.fosss.common.utils.R;
 import com.fosss.gulimall.member.entity.MemberEntity;
+import com.fosss.gulimall.member.vo.UserRegisterVo;
 
 import java.util.Map;
 
@@ -16,5 +18,20 @@ import java.util.Map;
 public interface MemberService extends IService<MemberEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 检查用户名是否唯一
+     */
+    boolean checkUsernameUnique(String userName);
+
+    /**
+     * 检查手机号是否唯一
+     */
+    boolean checkPasswordUnique(String password);
+
+    /**
+     * 注册功能
+     */
+    R register(UserRegisterVo userRegisterVo);
 }
 

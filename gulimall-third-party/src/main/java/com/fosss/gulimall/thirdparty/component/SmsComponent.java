@@ -3,6 +3,7 @@ package com.fosss.gulimall.thirdparty.component;
 import com.fosss.gulimall.thirdparty.utils.RandomUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,8 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
+
+import static com.fosss.common.constant.AuthServerConstant.SMS_CODE_CACHE_PREFIX;
 
 /**
  * @author: fosss
@@ -27,7 +30,7 @@ public class SmsComponent {
     @Resource
     private JavaMailSender javaMailSender;
     @Resource
-    private RedisTemplate<String, String> redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 通过邮箱发送验证码
@@ -38,7 +41,7 @@ public class SmsComponent {
         SimpleMailMessage message = new SimpleMailMessage();
 
         //从redis中获取验证码
-        String redisCode = redisTemplate.opsForValue().get(address);
+        String redisCode = stringRedisTemplate.opsForValue().get(address);
 
         if (!StringUtils.isEmpty(redisCode)) {
             return;//5分钟内已经发送过验证码了
@@ -48,7 +51,7 @@ public class SmsComponent {
          */
         String code = RandomUtil.getFourBitRandom();
         //将验证码存入redis，并设置5分钟内有效
-        redisTemplate.opsForValue().set(address, code, 5, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set(SMS_CODE_CACHE_PREFIX + address, code, 5, TimeUnit.MINUTES);
 
         message.setFrom(from + "(fo的谷粒商城)");//括号必须是英文状态下的
         message.setTo(address);
