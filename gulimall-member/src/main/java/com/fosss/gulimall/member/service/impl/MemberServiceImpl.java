@@ -5,10 +5,12 @@ import com.fosss.gulimall.member.dao.MemberLevelDao;
 import com.fosss.gulimall.member.entity.MemberLevelEntity;
 import com.fosss.gulimall.member.exception.PhoneUniqueException;
 import com.fosss.gulimall.member.exception.UsernameUniqueException;
+import com.fosss.gulimall.member.vo.MemberUserLoginVo;
 import com.fosss.gulimall.member.vo.UserRegisterVo;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -84,9 +86,31 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode(userRegisterVo.getPassword());
         memberEntity.setPassword(password);
+        memberEntity.setMobile(userRegisterVo.getPhone());
+        memberEntity.setGender(0);
+        memberEntity.setCreateTime(new Date());
 
         baseMapper.insert(memberEntity);
 
+    }
+
+    /**
+     * 登录功能
+     */
+    @Override
+    public MemberEntity login(MemberUserLoginVo loginVo) {
+        //查看是否存在该用户
+        LambdaQueryWrapper<MemberEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(MemberEntity::getUsername, loginVo.getLoginacct()).or().eq(MemberEntity::getEmail, loginVo.getLoginacct());
+        MemberEntity memberEntity = baseMapper.selectOne(wrapper);
+        if (memberEntity == null) {
+            return null;
+        }
+        //查看密码是否正确
+        String password = memberEntity.getPassword();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        boolean matches = passwordEncoder.matches(loginVo.getPassword(), password);
+        return matches ? memberEntity : null;
     }
 
 }

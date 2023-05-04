@@ -1,9 +1,11 @@
 package com.fosss.gulimall.authserver.controller;
 
 import com.fosss.common.constant.AuthServerConstant;
+import com.fosss.common.exception.ExceptionResult;
 import com.fosss.common.utils.R;
 import com.fosss.gulimall.authserver.feign.MemberFeignService;
 import com.fosss.gulimall.authserver.feign.SmsSendFeign;
+import com.fosss.gulimall.authserver.vo.UserLoginVo;
 import com.fosss.gulimall.authserver.vo.UserRegisterVo;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -39,6 +41,24 @@ public class LoginController {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private MemberFeignService memberFeignService;
+
+    /**
+     * 用户登录
+     */
+    @PostMapping("/login")
+    public String login(UserLoginVo userLoginVo, RedirectAttributes attributes) {
+        R r = memberFeignService.login(userLoginVo);
+        if (r.getCode() == 0) {
+            //登录成功
+            return "redirect:http://localhost";
+        } else {
+            //登录失败 TODO
+            Map<String, String> errors = new HashMap<>();
+            errors.put("msg", ExceptionResult.LOGINACCT_PASSWORD_EXCEPTION.getMessage());
+            attributes.addFlashAttribute("errors", errors);
+            return "redirect:http://auth.localhost/login.html";
+        }
+    }
 
     /**
      * TODO: 重定向携带数据：利用session原理，将数据放在session中。

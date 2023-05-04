@@ -3,11 +3,14 @@ package com.fosss.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.fosss.common.exception.ExceptionResult;
 import com.fosss.gulimall.member.dao.MemberLevelDao;
 import com.fosss.gulimall.member.entity.MemberLevelEntity;
 import com.fosss.gulimall.member.exception.PhoneUniqueException;
 import com.fosss.gulimall.member.exception.UsernameUniqueException;
+import com.fosss.gulimall.member.vo.MemberUserLoginVo;
 import com.fosss.gulimall.member.vo.UserRegisterVo;
+import com.netflix.hystrix.ExecutionResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +37,17 @@ import static com.fosss.common.exception.ExceptionResult.USER_EXIST_EXCEPTION;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
+    /**
+     * 登录功能
+     */
+    @PostMapping("/login")
+    public R login(@RequestBody MemberUserLoginVo loginVo) {
+        MemberEntity memberEntity = memberService.login(loginVo);
+        return memberEntity == null ?
+                R.error(ExceptionResult.LOGINACCT_PASSWORD_EXCEPTION.getCode(), ExceptionResult.LOGINACCT_PASSWORD_EXCEPTION.getMessage())
+                : R.ok();
+    }
 
     /**
      * 注册功能
