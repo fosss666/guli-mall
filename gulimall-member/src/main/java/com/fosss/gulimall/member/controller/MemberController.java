@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.fosss.gulimall.member.dao.MemberLevelDao;
 import com.fosss.gulimall.member.entity.MemberLevelEntity;
+import com.fosss.gulimall.member.exception.PhoneUniqueException;
+import com.fosss.gulimall.member.exception.UsernameUniqueException;
 import com.fosss.gulimall.member.vo.UserRegisterVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,9 @@ import com.fosss.common.utils.PageUtils;
 import com.fosss.common.utils.R;
 
 import javax.annotation.Resource;
+
+import static com.fosss.common.exception.ExceptionResult.PHONE_EXIST_EXCEPTION;
+import static com.fosss.common.exception.ExceptionResult.USER_EXIST_EXCEPTION;
 
 
 /**
@@ -38,8 +43,10 @@ public class MemberController {
         try {
             memberService.register(userRegisterVo);
             return R.ok();
-        }catch (Exception e) {
-            return R.error();
+        } catch (UsernameUniqueException e) {
+            return R.error(USER_EXIST_EXCEPTION.getCode(), USER_EXIST_EXCEPTION.getMessage());
+        } catch (PhoneUniqueException e) {
+            return R.error(PHONE_EXIST_EXCEPTION.getCode(), PHONE_EXIST_EXCEPTION.getMessage());
         }
     }
 

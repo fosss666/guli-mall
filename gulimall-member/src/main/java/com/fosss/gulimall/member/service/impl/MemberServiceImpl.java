@@ -6,6 +6,7 @@ import com.fosss.gulimall.member.entity.MemberLevelEntity;
 import com.fosss.gulimall.member.exception.PhoneUniqueException;
 import com.fosss.gulimall.member.exception.UsernameUniqueException;
 import com.fosss.gulimall.member.vo.UserRegisterVo;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -79,8 +80,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         memberEntity.setUsername(userRegisterVo.getUserName());
         memberEntity.setEmail(userRegisterVo.getPhone());
 
-        //3.设置密码，需要进行加密存储
-
+        //3.设置密码，需要进行加密存储，利用spring提供的md5加密（自动加盐）
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String password = encoder.encode(userRegisterVo.getPassword());
+        memberEntity.setPassword(password);
 
         baseMapper.insert(memberEntity);
 
