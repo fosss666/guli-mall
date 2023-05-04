@@ -52,7 +52,7 @@ public class LoginController {
             //登录成功
             return "redirect:http://localhost";
         } else {
-            //登录失败 TODO
+            //登录失败
             Map<String, String> errors = new HashMap<>();
             errors.put("msg", ExceptionResult.LOGINACCT_PASSWORD_EXCEPTION.getMessage());
             attributes.addFlashAttribute("errors", errors);
