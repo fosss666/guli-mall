@@ -49,7 +49,7 @@ public class LoginController {
     public String login(UserLoginVo userLoginVo, RedirectAttributes attributes) {
         R r = memberFeignService.login(userLoginVo);
         if (r.getCode() == 0) {
-            //登录成功
+            //登录成功   TODO 登录成功后的处理
             return "redirect:http://localhost";
         } else {
             //登录失败
