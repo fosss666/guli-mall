@@ -9,6 +9,7 @@ import com.fosss.gulimall.member.entity.MemberLevelEntity;
 import com.fosss.gulimall.member.exception.PhoneUniqueException;
 import com.fosss.gulimall.member.exception.UsernameUniqueException;
 import com.fosss.gulimall.member.vo.MemberUserLoginVo;
+import com.fosss.gulimall.member.vo.SocialUser;
 import com.fosss.gulimall.member.vo.UserRegisterVo;
 import com.netflix.hystrix.ExecutionResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,7 @@ import com.fosss.common.utils.R;
 
 import javax.annotation.Resource;
 
-import static com.fosss.common.exception.ExceptionResult.PHONE_EXIST_EXCEPTION;
-import static com.fosss.common.exception.ExceptionResult.USER_EXIST_EXCEPTION;
+import static com.fosss.common.exception.ExceptionResult.*;
 
 
 /**
@@ -37,6 +37,17 @@ import static com.fosss.common.exception.ExceptionResult.USER_EXIST_EXCEPTION;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
+    /**
+     * gitee登录中登录或注册账号
+     */
+    @PostMapping("/OAuth/login")
+    public R GiteeLogin(@RequestBody SocialUser socialUser) throws Exception {
+        MemberEntity memberEntity = memberService.GiteeLogin(socialUser);
+        return memberEntity == null ?
+                R.error(GITEE_LOGIN_ERROR.getCode(), GITEE_LOGIN_ERROR.getMessage())
+                : R.ok();
+    }
 
     /**
      * 登录功能

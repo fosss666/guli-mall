@@ -1,16 +1,24 @@
 package com.fosss.gulimall.member.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fosss.common.utils.HttpUtils;
 import com.fosss.gulimall.member.dao.MemberLevelDao;
 import com.fosss.gulimall.member.entity.MemberLevelEntity;
 import com.fosss.gulimall.member.exception.PhoneUniqueException;
 import com.fosss.gulimall.member.exception.UsernameUniqueException;
 import com.fosss.gulimall.member.vo.MemberUserLoginVo;
+import com.fosss.gulimall.member.vo.SocialUser;
 import com.fosss.gulimall.member.vo.UserRegisterVo;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -22,6 +30,7 @@ import com.fosss.common.utils.Query;
 import com.fosss.gulimall.member.dao.MemberDao;
 import com.fosss.gulimall.member.entity.MemberEntity;
 import com.fosss.gulimall.member.service.MemberService;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 
@@ -111,6 +120,58 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         boolean matches = passwordEncoder.matches(loginVo.getPassword(), password);
         return matches ? memberEntity : null;
+    }
+
+    /**
+     * gitee登录中登录或注册账号
+     */
+    @Override
+    public MemberEntity GiteeLogin(SocialUser socialUser) throws Exception {
+        //查询用户信息
+        //根据令牌获取用户id  https://gitee.com/api/v5/user?access_token=08bfa59b044a5163cafd9f45fd322134
+        Map<String, String> headers = new HashMap<>();
+        Map<String, String> querys = new HashMap<>();
+        querys.put("access_token", socialUser.getAccess_token());
+        HttpResponse httpResponse = HttpUtils.doGet("https://gitee.com", "/api/v5/user", "get", headers, querys);
+        JSONObject jsonObject = null;
+        //获取并设置用户id
+        HttpEntity entity1 = httpResponse.getEntity();
+        String string = EntityUtils.toString(entity1);
+        //这个jsonObject中储存着用户信息
+        jsonObject = JSON.parseObject(string);
+        socialUser.setUid(jsonObject.getString("id"));
+
+
+        //根据是否存在该用户id判断是要登录还是要注册
+        MemberEntity memberEntity = baseMapper.selectOne(new LambdaQueryWrapper<MemberEntity>().eq(MemberEntity::getSocialUid, socialUser.getUid()));
+        if (memberEntity == null) {
+            //需要进行注册
+            MemberEntity entity = new MemberEntity();
+            String name = jsonObject.getString("name");
+            String email = jsonObject.getString("email");
+
+            if (!StringUtils.isEmpty(name)) {
+                entity.setUsername(name);
+            }
+            if (!StringUtils.isEmpty(email)) {
+                entity.setEmail(email);
+            }
+            //……
+            entity.setAccessToken(socialUser.getAccess_token());
+            entity.setExpiresIn(socialUser.getExpires_in() + "");
+            entity.setSocialUid(socialUser.getUid());
+            baseMapper.insert(entity);
+            return entity;
+        } else {
+            //直接登录，需要修改token等
+            memberEntity.setSocialUid(socialUser.getUid());
+            memberEntity.setExpiresIn(socialUser.getExpires_in() + "");
+            memberEntity.setAccessToken(socialUser.getAccess_token());
+            baseMapper.updateById(memberEntity);
+            return memberEntity;
+
+        }
+
     }
 
 }

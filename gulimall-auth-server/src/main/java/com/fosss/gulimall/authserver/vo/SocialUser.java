@@ -9,14 +9,25 @@ import lombok.Data;
 @Data
 public class SocialUser {
 
+    /**
+     * 令牌
+     */
     private String access_token;
 
-    private String remind_in;
-
+    private String token_type;
+    /**
+     * 过期时间
+     */
     private long expires_in;
 
-    private String uid;
+    private String refresh_token;
 
-    private String isRealName;
+    private String scope;
+
+    private String created_at;
+    /**
+     * 用户id
+     */
+    private String uid;
 
 }
