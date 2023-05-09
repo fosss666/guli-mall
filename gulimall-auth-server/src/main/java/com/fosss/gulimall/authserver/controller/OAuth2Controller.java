@@ -2,11 +2,14 @@ package com.fosss.gulimall.authserver.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.fosss.common.exception.ExceptionResult;
 import com.fosss.common.utils.HttpUtils;
 import com.fosss.common.utils.R;
 import com.fosss.gulimall.authserver.feign.MemberFeignService;
+import com.fosss.gulimall.authserver.vo.MemberRespVo;
 import com.fosss.gulimall.authserver.vo.SocialUser;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,18 +31,20 @@ import java.util.Map;
  * Time: 21:49
  * Description: 社交登录
  */
+@Slf4j
 @Controller
 public class OAuth2Controller {
 
+    @Resource
     private MemberFeignService memberFeignService;
 
-    @Value("OAuth.gitee.grant_type")
+    @Value("${OAuth.gitee.grant_type}")
     private String grant_type;
-    @Value("OAuth.gitee.redirect_uri")
+    @Value("${OAuth.gitee.redirect_uri}")
     private String redirect_uri;
-    @Value("OAuth.gitee.client_id")
+    @Value("${OAuth.gitee.client_id}")
     private String client_id;
-    @Value("OAuth.gitee.client_secret")
+    @Value("${OAuth.gitee.client_secret}")
     private String client_secret;
 
     /**
@@ -67,20 +73,24 @@ public class OAuth2Controller {
 
             //知道这是哪个社交用户
             //如果是第一次进网站就要为这个用户注册一个账号，然后登录，否则直接登录
-            //TODO 调用远程服务登录或注册账号
+            // 调用远程服务登录或注册账号
             R r = memberFeignService.GiteeLogin(socialUser);
-            if (r.getCode() == 200) {
+            if (r.getCode() == 0) {
                 //登录成功跳回首页
+                //获取数据
+                MemberRespVo memberRespVo = r.getData("data", new TypeReference<MemberRespVo>() {
+                });
+                log.info("登录成功，用户信息：{}", memberRespVo);
                 return "redirect:http://localhost";
             } else {
                 Map<String, String> errors = new HashMap<>();
                 errors.put("msg", ExceptionResult.GITEE_LOGIN_ERROR.getMessage());
                 attributes.addFlashAttribute("errors", errors);
-                return "redirect:http://localhost/login.html";
+                return "redirect:http://auth.localhost/login.html";
             }
         } else {
             //失败则跳到登录页
-            return "redirect:http://localhost/login.html";
+            return "redirect:http://auth.localhost/login.html";
         }
 
     }

@@ -1,14 +1,13 @@
 package com.fosss.common.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 返回数据
- *
- * @author chenshun
- * @email sunlightcs@gmail.com
- * @date 2016年10月27日 下午9:59:27
  */
 public class R extends HashMap<String, Object> {
     private static final long serialVersionUID = 1L;
@@ -52,6 +51,14 @@ public class R extends HashMap<String, Object> {
     public R put(String key, Object value) {
         super.put(key, value);
         return this;
+    }
+
+    //利用fastjson进行反序列化
+    public <T> T getData(String key, TypeReference<T> typeReference) {
+        Object data = get(key);	//默认是map
+        String jsonString = JSON.toJSONString(data);
+        T t = JSON.parseObject(jsonString, typeReference);
+        return t;
     }
 
     public Integer getCode() {

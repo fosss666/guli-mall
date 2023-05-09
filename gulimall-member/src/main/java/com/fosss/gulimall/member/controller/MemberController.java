@@ -57,7 +57,7 @@ public class MemberController {
         MemberEntity memberEntity = memberService.login(loginVo);
         return memberEntity == null ?
                 R.error(ExceptionResult.LOGINACCT_PASSWORD_EXCEPTION.getCode(), ExceptionResult.LOGINACCT_PASSWORD_EXCEPTION.getMessage())
-                : R.ok();
+                : R.ok().put("data",memberEntity);
     }
 
     /**
