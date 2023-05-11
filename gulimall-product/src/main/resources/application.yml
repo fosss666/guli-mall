@@ -15,7 +15,7 @@ spring:
     name: gulimall-product
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
-  thymeleaf:  #关闭thymeleaf缓存
+  thymeleaf: #关闭thymeleaf缓存
     cache: false
   redis:
     host: 192.168.113.128
@@ -24,6 +24,8 @@ spring:
     type: redis   #配置缓存类型
     redis:
       time-to-live: 3600000   # 1小时
+  session:
+    store-type: redis  #配置session存储到redis
 #      use-key-prefix: true  #默认key使用前缀
 #      cache-null-values: true  #默认会缓存空值（解决缓存穿透）
 #      key-prefix: CACHE_     默认分区名为前缀

@@ -156,6 +156,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
             if (!StringUtils.isEmpty(email)) {
                 entity.setEmail(email);
             }
+            entity.setLevelId(1L);//会员等级
             //……
             entity.setAccessToken(socialUser.getAccess_token());
             entity.setExpiresIn(socialUser.getExpires_in() + "");

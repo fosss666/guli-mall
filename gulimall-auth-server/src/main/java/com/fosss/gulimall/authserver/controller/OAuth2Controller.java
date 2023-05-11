@@ -1,13 +1,12 @@
 package com.fosss.gulimall.authserver.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.fosss.common.exception.ExceptionResult;
 import com.fosss.common.utils.HttpUtils;
 import com.fosss.common.utils.R;
 import com.fosss.gulimall.authserver.feign.MemberFeignService;
-import com.fosss.gulimall.authserver.vo.MemberRespVo;
+import com.fosss.common.vo.MemberRespVo;
 import com.fosss.gulimall.authserver.vo.SocialUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -15,13 +14,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,7 +50,7 @@ public class OAuth2Controller {
      * gitee登录
      */
     @GetMapping("/oauth2.0/gitee/success")
-    public String gitee(@RequestParam("code") String code, RedirectAttributes attributes) throws Exception {
+    public String gitee(@RequestParam("code") String code, RedirectAttributes attributes, HttpSession session) throws Exception {
         Map<String, String> map = new HashMap<>();
         map.put("client_id", client_id);
         map.put("client_secret", client_secret);
@@ -81,6 +80,9 @@ public class OAuth2Controller {
                 MemberRespVo memberRespVo = r.getData("data", new TypeReference<MemberRespVo>() {
                 });
                 log.info("登录成功，用户信息：{}", memberRespVo);
+                //存储到session中
+                //todo 1.当前session的作用域为当前域，无法与子域分享信息 2.使用json的序列化存储数据到redis中
+                session.setAttribute("loginUser", memberRespVo);
                 return "redirect:http://localhost";
             } else {
                 Map<String, String> errors = new HashMap<>();

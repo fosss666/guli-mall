@@ -6,6 +6,8 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableMBeanExport;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * 读多写少读数据直接用SpringCache,写数据可以加读写锁，读多写多直接查数据库
@@ -26,7 +28,7 @@ import org.springframework.context.annotation.ComponentScan;
  * 3.开启缓存注解 @EnableCaching
  * 4.在需要缓存的方法上添加相应注解
  */
-
+@EnableRedisHttpSession //开启使用redis存储session
 @EnableDiscoveryClient//开启注册中心
 @SpringBootApplication
 @ComponentScan(basePackages = "com.fosss")
