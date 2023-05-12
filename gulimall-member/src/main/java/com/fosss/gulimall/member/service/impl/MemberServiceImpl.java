@@ -89,6 +89,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         checkPhoneUnique(userRegisterVo.getPhone());
         //设置用户名和手机号
         memberEntity.setUsername(userRegisterVo.getUserName());
+        memberEntity.setNickname(userRegisterVo.getUserName());
         memberEntity.setEmail(userRegisterVo.getPhone());
 
         //3.设置密码，需要进行加密存储，利用spring提供的md5加密（自动加盐）

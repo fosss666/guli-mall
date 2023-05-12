@@ -24,6 +24,8 @@ import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.fosss.common.constant.AuthServerConstant.LOGIN_USER;
+
 /**
  * @author: fosss
  * Date: 2023/5/6
@@ -83,7 +85,7 @@ public class OAuth2Controller {
                 //存储到session中
                 // 1.当前session的作用域为当前域，无法与子域分享信息 所以需要自定义session
                 // 2.使用json的序列化存储数据到redis中
-                session.setAttribute("loginUser", memberRespVo);
+                session.setAttribute(LOGIN_USER, memberRespVo);
                 return "redirect:http://localhost";
             } else {
                 Map<String, String> errors = new HashMap<>();

@@ -1,8 +1,10 @@
 package com.fosss.gulimall.authserver.controller;
 
+import com.alibaba.fastjson.TypeReference;
 import com.fosss.common.constant.AuthServerConstant;
 import com.fosss.common.exception.ExceptionResult;
 import com.fosss.common.utils.R;
+import com.fosss.common.vo.MemberRespVo;
 import com.fosss.gulimall.authserver.feign.MemberFeignService;
 import com.fosss.gulimall.authserver.feign.SmsSendFeign;
 import com.fosss.gulimall.authserver.vo.UserLoginVo;
@@ -19,11 +21,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.fosss.common.constant.AuthServerConstant.LOGIN_USER;
 import static com.fosss.common.constant.AuthServerConstant.SMS_CODE_CACHE_PREFIX;
 
 /**
@@ -46,10 +50,13 @@ public class LoginController {
      * 用户登录
      */
     @PostMapping("/login")
-    public String login(UserLoginVo userLoginVo, RedirectAttributes attributes) {
+    public String login(UserLoginVo userLoginVo, RedirectAttributes attributes, HttpSession session) {
         R r = memberFeignService.login(userLoginVo);
         if (r.getCode() == 0) {
-            //登录成功   TODO 登录成功后的处理
+            //登录成功   登录成功后的处理-将用户信息存储到session中
+            MemberRespVo data = r.getData("data", new TypeReference<MemberRespVo>() {
+            });
+            session.setAttribute(LOGIN_USER, data);
             return "redirect:http://localhost";
         } else {
             //登录失败

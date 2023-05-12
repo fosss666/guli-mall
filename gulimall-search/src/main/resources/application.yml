@@ -11,9 +11,12 @@ spring:
         server-addr: 127.0.0.1:8848
   thymeleaf:
     cache: false
+  redis:
+    host: 192.168.113.127
+  session:
+    store-type: redis
 es:
   config:
     hostname: "192.168.113.128"
     port: 9200
     scheme: "http"
-
