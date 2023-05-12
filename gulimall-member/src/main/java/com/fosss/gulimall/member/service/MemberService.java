@@ -2,6 +2,7 @@ package com.fosss.gulimall.member.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fosss.common.utils.PageUtils;
+import com.fosss.common.vo.MemberRespVo;
 import com.fosss.gulimall.member.entity.MemberEntity;
 import com.fosss.gulimall.member.vo.MemberUserLoginVo;
 import com.fosss.gulimall.member.vo.SocialUser;
@@ -33,7 +34,7 @@ public interface MemberService extends IService<MemberEntity> {
     /**
      * 注册功能
      */
-    void register(UserRegisterVo userRegisterVo);
+    MemberRespVo register(UserRegisterVo userRegisterVo);
     /**
      * 登录功能
      */

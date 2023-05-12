@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import com.fosss.common.exception.ExceptionResult;
+import com.fosss.common.vo.MemberRespVo;
 import com.fosss.gulimall.member.dao.MemberLevelDao;
 import com.fosss.gulimall.member.entity.MemberLevelEntity;
 import com.fosss.gulimall.member.exception.PhoneUniqueException;
@@ -57,7 +58,7 @@ public class MemberController {
         MemberEntity memberEntity = memberService.login(loginVo);
         return memberEntity == null ?
                 R.error(ExceptionResult.LOGINACCT_PASSWORD_EXCEPTION.getCode(), ExceptionResult.LOGINACCT_PASSWORD_EXCEPTION.getMessage())
-                : R.ok().put("data",memberEntity);
+                : R.ok().put("data", memberEntity);
     }
 
     /**
@@ -66,8 +67,8 @@ public class MemberController {
     @PostMapping("/register")
     public R register(@RequestBody UserRegisterVo userRegisterVo) {
         try {
-            memberService.register(userRegisterVo);
-            return R.ok();
+            MemberRespVo memberRespVo = memberService.register(userRegisterVo);
+            return R.ok().put("data", memberRespVo);
         } catch (UsernameUniqueException e) {
             return R.error(USER_EXIST_EXCEPTION.getCode(), USER_EXIST_EXCEPTION.getMessage());
         } catch (PhoneUniqueException e) {

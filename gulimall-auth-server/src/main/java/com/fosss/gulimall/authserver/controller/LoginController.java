@@ -76,7 +76,7 @@ public class LoginController {
      */
     @PostMapping(value = "/register")
     public String register(@Valid UserRegisterVo vos, BindingResult result,
-                           RedirectAttributes attributes) {
+                           RedirectAttributes attributes, HttpSession session) {
 
         //如果有错误回到注册页面
         if (result.hasErrors()) {
@@ -101,6 +101,9 @@ public class LoginController {
                 R register = memberFeignService.register(vos);
                 if (register.getCode() == 0) {
                     //成功
+                    MemberRespVo data = register.getData("data", new TypeReference<MemberRespVo>() {
+                    });
+                    session.setAttribute(LOGIN_USER, data);
                     return "redirect:http://auth.localhost/login.html";
                 } else {
                     //失败

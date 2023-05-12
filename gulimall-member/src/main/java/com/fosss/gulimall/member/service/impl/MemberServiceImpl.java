@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fosss.common.utils.HttpUtils;
+import com.fosss.common.vo.MemberRespVo;
 import com.fosss.gulimall.member.dao.MemberLevelDao;
 import com.fosss.gulimall.member.entity.MemberLevelEntity;
 import com.fosss.gulimall.member.exception.PhoneUniqueException;
@@ -14,6 +15,7 @@ import com.fosss.gulimall.member.vo.UserRegisterVo;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -74,8 +76,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         }
     }
 
+    /**
+     * 注册功能
+     */
     @Override
-    public void register(UserRegisterVo userRegisterVo) {
+    public MemberRespVo register(UserRegisterVo userRegisterVo) {
         MemberEntity memberEntity = new MemberEntity();
         //1.设置默认会员等级
         //查询默认等级
@@ -101,7 +106,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         memberEntity.setCreateTime(new Date());
 
         baseMapper.insert(memberEntity);
-
+        MemberRespVo memberRespVo = new MemberRespVo();
+        BeanUtils.copyProperties(memberEntity, memberRespVo);
+        return memberRespVo;
     }
 
     /**
