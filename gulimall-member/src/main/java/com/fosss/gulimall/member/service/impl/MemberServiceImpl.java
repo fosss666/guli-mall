@@ -152,6 +152,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 
             if (!StringUtils.isEmpty(name)) {
                 entity.setUsername(name);
+                entity.setNickname(name);
             }
             if (!StringUtils.isEmpty(email)) {
                 entity.setEmail(email);

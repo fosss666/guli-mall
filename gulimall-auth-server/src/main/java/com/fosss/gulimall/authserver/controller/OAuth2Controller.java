@@ -81,7 +81,8 @@ public class OAuth2Controller {
                 });
                 log.info("登录成功，用户信息：{}", memberRespVo);
                 //存储到session中
-                //todo 1.当前session的作用域为当前域，无法与子域分享信息 2.使用json的序列化存储数据到redis中
+                // 1.当前session的作用域为当前域，无法与子域分享信息 所以需要自定义session
+                // 2.使用json的序列化存储数据到redis中
                 session.setAttribute("loginUser", memberRespVo);
                 return "redirect:http://localhost";
             } else {
