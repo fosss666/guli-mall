@@ -57,11 +57,14 @@ spring:
           predicates:
           - Host=search.localhost
 
-        - id: gulimall_auth_server
+        - id: gulimall_auth_server_route
           uri: lb://gulimall-auth-server #登录页面
           predicates:
           - Host=auth.localhost
-
+        - id: gulimall_cart_route
+          uri: lb://gulimall-cart #购物车
+          predicates:
+          - Host=cart.localhost
 
 
 
