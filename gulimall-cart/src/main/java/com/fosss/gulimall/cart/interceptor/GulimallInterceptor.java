@@ -39,7 +39,7 @@ public class GulimallInterceptor implements HandlerInterceptor {
             //已经登录，设置用户id
             userInfoTo.setUserId(member.getId());
         }
-        //查看是否是临时用户
+        //根据cookie中是否有"user-key"判断是否有临时用户
         Cookie[] cookies = request.getCookies();
         if (cookies != null && cookies.length > 0) {
             for (Cookie cookie : cookies) {

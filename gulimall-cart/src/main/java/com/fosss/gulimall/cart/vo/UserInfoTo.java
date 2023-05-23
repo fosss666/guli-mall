@@ -1,6 +1,7 @@
 package com.fosss.gulimall.cart.vo;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * @author: fosss
@@ -8,6 +9,7 @@ import lombok.Data;
  * Time: 21:26
  * Description:
  */
+@ToString
 @Data
 public class UserInfoTo {
     private Long userId;
