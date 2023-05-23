@@ -11,6 +11,7 @@ import com.fosss.gulimall.cart.vo.CartItemVo;
 import com.fosss.gulimall.cart.vo.SkuInfoVo;
 import com.fosss.gulimall.cart.vo.UserInfoTo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -43,42 +44,57 @@ public class CartServiceImpl implements CartService {
      */
     @Override
     public CartItemVo addToCart(Long skuId, Integer num) throws ExecutionException, InterruptedException {
-        CartItemVo cartItemVo = new CartItemVo();
         //获取统一redis
-        BoundValueOperations<String, String> cartRedis = cartRedis();
+        BoundHashOperations<String, Object, Object> cartRedis = cartRedis();
 
-        //远程根据skuId获取sku信息
-        CompletableFuture<Void> skuInfo = CompletableFuture.runAsync(() -> {
-            R info = productFeignService.info(skuId);
-            SkuInfoVo data = info.getData("skuInfo", new TypeReference<SkuInfoVo>() {
+        /**
+         * 根据购物车中是否有该sku进行分别处理，如果有，则只改数量即可，没有则需要添加
+         */
+        String cart = (String) cartRedis.get(skuId);
+        if (cart != null) {
+            //有该商品
+            //获取原数据修改数量
+            CartItemVo cartItemVo = JSON.parseObject(cart, CartItemVo.class);
+            cartItemVo.setCount(cartItemVo.getCount() + num);
+            return cartItemVo;
+        } else {
+            //没有该商品，需要添加
+            CartItemVo cartItemVo = new CartItemVo();
+
+            //远程根据skuId获取sku信息
+            CompletableFuture<Void> skuInfo = CompletableFuture.runAsync(() -> {
+                R info = productFeignService.info(skuId);
+                SkuInfoVo data = info.getData("skuInfo", new TypeReference<SkuInfoVo>() {
+                });
+                //将data中的信息复制到返回对象中
+                cartItemVo.setSkuId(skuId);
+                cartItemVo.setCheck(true);
+                cartItemVo.setCount(num);
+                cartItemVo.setImage(data.getSkuDefaultImg());
+                cartItemVo.setPrice(data.getPrice());
+                cartItemVo.setTitle(data.getSkuTitle());
+            }, threadPoolExecutor);
+
+            //远程获取attr
+            CompletableFuture<Void> attr = CompletableFuture.runAsync(() -> {
+                List<String> attrsAsStringList = productFeignService.getAttrsAsStringList(skuId);
+                cartItemVo.setSkuAttrValues(attrsAsStringList);
             });
-            //将data中的信息复制到返回对象中
-            cartItemVo.setSkuId(skuId);
-            cartItemVo.setCheck(true);
-            cartItemVo.setCount(num);
-            cartItemVo.setImage(data.getSkuDefaultImg());
-            cartItemVo.setPrice(data.getPrice());
-            cartItemVo.setTitle(data.getSkuTitle());
-        }, threadPoolExecutor);
 
-        //远程获取attr
-        CompletableFuture<Void> attr = CompletableFuture.runAsync(() -> {
-            List<String> attrsAsStringList = productFeignService.getAttrsAsStringList(skuId);
-            cartItemVo.setSkuAttrValues(attrsAsStringList);
-        });
+            //在上面两个线程全部执行完毕后，将结果对象存储到redis中并返回
+            CompletableFuture.allOf(skuInfo, attr).get();
+            //转为json
+            String string = JSON.toJSONString(cartItemVo);
+            cartRedis.put(skuId.toString(), string);
+            return cartItemVo;
+        }
 
-        //在上面两个线程全部执行完毕后，将结果对象存储到redis中并返回
-        CompletableFuture.allOf(skuInfo, attr).get();
-        //转为json
-        String string = JSON.toJSONString(cartItemVo);
-        cartRedis.set(string);
-        return cartItemVo;
     }
 
     /**
      * 统一redis的Hash存储
      */
-    private BoundValueOperations<String, String> cartRedis() {
+    private BoundHashOperations<String, Object, Object> cartRedis() {
         //从ThreadLocal中获取用户信息
         UserInfoTo userInfoTo = GulimallInterceptor.threadLocal.get();
         //判断是否登录
@@ -89,7 +105,7 @@ public class CartServiceImpl implements CartService {
         } else {
             userKey = CartConstant.CART_PREFIX + userInfoTo.getUserKey();
         }
-        BoundValueOperations<String, String> cartOps = stringRedisTemplate.boundValueOps(userKey);
+        BoundHashOperations<String, Object, Object> cartOps = stringRedisTemplate.boundHashOps(userKey);
         return cartOps;
     }
 }
