@@ -1,9 +1,13 @@
 package com.fosss.gulimall.cart.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.fosss.common.constant.CartConstant;
+import com.fosss.common.utils.R;
+import com.fosss.gulimall.cart.feign.ProductFeignService;
 import com.fosss.gulimall.cart.interceptor.GulimallInterceptor;
 import com.fosss.gulimall.cart.service.CartService;
 import com.fosss.gulimall.cart.vo.CartItemVo;
+import com.fosss.gulimall.cart.vo.SkuInfoVo;
 import com.fosss.gulimall.cart.vo.UserInfoTo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.BoundValueOperations;
@@ -27,6 +31,8 @@ public class CartServiceImpl implements CartService {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
+    @Resource
+    private ProductFeignService productFeignService;
 
     /**
      * 将商品添加到购物车
@@ -40,7 +46,16 @@ public class CartServiceImpl implements CartService {
 
         //远程根据skuId获取sku信息
         CompletableFuture<Void> skuInfo = CompletableFuture.runAsync(() -> {
-
+            R info = productFeignService.info(skuId);
+            SkuInfoVo data = info.getData("skuInfo", new TypeReference<SkuInfoVo>() {
+            });
+            //将data中的信息复制到返回对象中
+            cartItemVo.setSkuId(skuId);
+            cartItemVo.setCheck(true);
+            cartItemVo.setCount(num);
+            cartItemVo.setImage(data.getSkuDefaultImg());
+            cartItemVo.setPrice(data.getPrice());
+            cartItemVo.setTitle(data.getSkuTitle());
         }, threadPoolExecutor);
 
         //远程获取attr
