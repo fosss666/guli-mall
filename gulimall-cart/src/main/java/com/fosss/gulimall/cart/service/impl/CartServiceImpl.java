@@ -1,5 +1,6 @@
 package com.fosss.gulimall.cart.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.fosss.common.constant.CartConstant;
 import com.fosss.common.utils.R;
@@ -15,7 +16,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -39,7 +42,7 @@ public class CartServiceImpl implements CartService {
      * 使用多线程提高性能
      */
     @Override
-    public CartItemVo addToCart(Long skuId, Integer num) {
+    public CartItemVo addToCart(Long skuId, Integer num) throws ExecutionException, InterruptedException {
         CartItemVo cartItemVo = new CartItemVo();
         //获取统一redis
         BoundValueOperations<String, String> cartRedis = cartRedis();
@@ -59,9 +62,17 @@ public class CartServiceImpl implements CartService {
         }, threadPoolExecutor);
 
         //远程获取attr
+        CompletableFuture<Void> attr = CompletableFuture.runAsync(() -> {
+            List<String> attrsAsStringList = productFeignService.getAttrsAsStringList(skuId);
+            cartItemVo.setSkuAttrValues(attrsAsStringList);
+        });
 
-
-        return null;
+        //在上面两个线程全部执行完毕后，将结果对象存储到redis中并返回
+        CompletableFuture.allOf(skuInfo, attr).get();
+        //转为json
+        String string = JSON.toJSONString(cartItemVo);
+        cartRedis.set(string);
+        return cartItemVo;
     }
 
     /**
