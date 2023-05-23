@@ -1,5 +1,7 @@
 package com.fosss.gulimall.cart.service;
 
+import com.fosss.gulimall.cart.vo.CartItemVo;
+
 /**
  * @author: fosss
  * Date: 2023/5/22
@@ -7,4 +9,8 @@ package com.fosss.gulimall.cart.service;
  * Description:
  */
 public interface CartService {
+    /**
+     * 将商品添加到购物车
+     */
+    CartItemVo addToCart(Long skuId, Integer num);
 }

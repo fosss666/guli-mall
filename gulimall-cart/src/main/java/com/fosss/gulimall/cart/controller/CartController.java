@@ -1,9 +1,16 @@
 package com.fosss.gulimall.cart.controller;
 
 import com.fosss.gulimall.cart.interceptor.GulimallInterceptor;
+import com.fosss.gulimall.cart.service.CartService;
+import com.fosss.gulimall.cart.vo.CartItemVo;
 import com.fosss.gulimall.cart.vo.UserInfoTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.annotation.Resource;
 
 /**
  * @author: fosss
@@ -13,8 +20,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class CartController {
-    @RequestMapping("/success.html")
-    public String success() {
+
+    @Resource
+    private CartService cartService;
+
+    /**
+     * 将商品添加到购物车
+     */
+    @GetMapping("/addToCart")
+    public String addToCart(@RequestParam("skuId") Long skuId,
+                            @RequestParam("num") Integer num,
+                            Model model) {
+        CartItemVo cartItemVo = cartService.addToCart(skuId, num);
+        model.addAttribute("item", cartItemVo);
         return "success";
     }
 
