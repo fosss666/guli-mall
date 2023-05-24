@@ -15,4 +15,8 @@ public interface CartService {
      * 将商品添加到购物车
      */
     CartItemVo addToCart(Long skuId, Integer num) throws ExecutionException, InterruptedException;
+    /**
+     * 从redis中查询购物车
+     */
+    CartItemVo searchCartItem(Long skuId);
 }

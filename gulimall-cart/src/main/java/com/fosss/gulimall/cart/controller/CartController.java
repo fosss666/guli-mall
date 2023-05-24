@@ -7,10 +7,13 @@ import com.fosss.gulimall.cart.vo.UserInfoTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author: fosss
@@ -26,12 +29,28 @@ public class CartController {
 
     /**
      * 将商品添加到购物车
+     * 如果直接跳转到success页面的话，会存在问题，当网页刷新时会重复执行添加购物车方法，导致商品数量增加
+     * 解决方案:重定向到另一个方法，携带参数skuId,在那个方法中根据skuId从redis中查询购物车数据，这样网页再刷新时，一直刷新的是重定向后的url，就不会出现
+     * 重复添加的问题了
      */
     @GetMapping("/addToCart")
     public String addToCart(@RequestParam("skuId") Long skuId,
                             @RequestParam("num") Integer num,
-                            Model model) {
+                            RedirectAttributes redirectAttributes) throws ExecutionException, InterruptedException {
         CartItemVo cartItemVo = cartService.addToCart(skuId, num);
+        //model.addAttribute("item", cartItemVo);
+        //会将skuId拼接到url后面
+        redirectAttributes.addAttribute("skuId", skuId);
+        return "redirect:http://cart.localhost/addToCartSuccess.html";
+    }
+
+    /**
+     * 从redis中查询购物车
+     */
+    @GetMapping("addToCartSuccess.html")
+    public String addToCartSuccess(@PathVariable("skuId") Long skuId,
+                                   Model model) {
+        CartItemVo cartItemVo = cartService.searchCartItem(skuId);
         model.addAttribute("item", cartItemVo);
         return "success";
     }

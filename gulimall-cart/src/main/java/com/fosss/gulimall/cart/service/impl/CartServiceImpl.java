@@ -92,6 +92,17 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
+     * 从redis中查询购物车
+     */
+    @Override
+    public CartItemVo searchCartItem(Long skuId) {
+        BoundHashOperations<String, Object, Object> cartRedis = cartRedis();
+        String cart = (String) cartRedis.get(skuId);
+        CartItemVo cartItemVo = JSON.parseObject(cart, CartItemVo.class);
+        return cartItemVo;
+    }
+
+    /**
      * 统一redis的Hash存储
      */
     private BoundHashOperations<String, Object, Object> cartRedis() {
