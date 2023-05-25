@@ -8,6 +8,7 @@ import com.fosss.gulimall.cart.feign.ProductFeignService;
 import com.fosss.gulimall.cart.interceptor.GulimallInterceptor;
 import com.fosss.gulimall.cart.service.CartService;
 import com.fosss.gulimall.cart.vo.CartItemVo;
+import com.fosss.gulimall.cart.vo.CartVo;
 import com.fosss.gulimall.cart.vo.SkuInfoVo;
 import com.fosss.gulimall.cart.vo.UserInfoTo;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * @author: fosss
@@ -37,6 +39,51 @@ public class CartServiceImpl implements CartService {
     private ThreadPoolExecutor threadPoolExecutor;
     @Resource
     private ProductFeignService productFeignService;
+
+    /**
+     * 获取购物车
+     * 根据是否登录分别获取
+     */
+    @Override
+    public CartVo getCart() throws ExecutionException, InterruptedException {
+        UserInfoTo userInfoTo = GulimallInterceptor.threadLocal.get();
+        Long userId = userInfoTo.getUserId();
+
+        CartVo cartVo = new CartVo();
+        //从临时购物车中获取数据
+        String tempUserKey = CartConstant.CART_PREFIX + userInfoTo.getUserKey();
+        List<CartItemVo> cartItems = getCartItems(tempUserKey);
+        if (userId == null) {
+            //没有登录，则从临时购物车中获取
+            cartVo.setItems(cartItems);
+        } else {
+            //已经登录了，则从购物车中获取，并将临时购物车合并到购物车，删除临时购物车
+            //将临时购物车添加到购物车
+            for (CartItemVo cartItem : cartItems) {
+                addToCart(cartItem.getSkuId(), cartItem.getCount());
+            }
+            //获取合并的数据
+            String userKey = CartConstant.CART_PREFIX + userInfoTo.getUserId();
+            List<CartItemVo> cartItems1 = getCartItems(userKey);
+            cartVo.setItems(cartItems1);
+
+        }
+        return cartVo;
+    }
+
+    /**
+     * 获取redis中的购物项
+     */
+    private List<CartItemVo> getCartItems(String userKey) {
+        BoundHashOperations<String, Object, Object> boundHashOps = stringRedisTemplate.boundHashOps(userKey);
+        List<Object> values = boundHashOps.values();
+        List<CartItemVo> cartItems = values.stream().map((obj) -> {
+            CartItemVo cartItemVo = JSON.parseObject((String) obj, CartItemVo.class);
+            return cartItemVo;
+        }).collect(Collectors.toList());
+        return cartItems;
+    }
+
 
     /**
      * 将商品添加到购物车

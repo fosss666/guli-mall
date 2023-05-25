@@ -1,6 +1,7 @@
 package com.fosss.gulimall.cart.service;
 
 import com.fosss.gulimall.cart.vo.CartItemVo;
+import com.fosss.gulimall.cart.vo.CartVo;
 
 import java.util.concurrent.ExecutionException;
 
@@ -19,4 +20,9 @@ public interface CartService {
      * 从redis中查询购物车
      */
     CartItemVo searchCartItem(Long skuId);
+
+    /**
+     * 获取购物车
+     */
+    CartVo getCart() throws ExecutionException, InterruptedException;
 }
