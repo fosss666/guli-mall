@@ -29,6 +29,16 @@ public class CartController {
     private CartService cartService;
 
     /**
+     * 选中购物项
+     */
+    @GetMapping("/checkItem")
+    public String checkItem(@RequestParam("skuId") Long skuId,
+                            @RequestParam("check") Integer check) {
+        cartService.checkItem(skuId, check);
+        return "redirect:http://cart.localhost/cart.html";
+    }
+
+    /**
      * 将商品添加到购物车
      * 如果直接跳转到success页面的话，会存在问题，当网页刷新时会重复执行添加购物车方法，导致商品数量增加
      * 解决方案:重定向到另一个方法，携带参数skuId,在那个方法中根据skuId从redis中查询购物车数据，这样网页再刷新时，一直刷新的是重定向后的url，就不会出现

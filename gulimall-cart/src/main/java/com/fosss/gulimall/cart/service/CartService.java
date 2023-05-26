@@ -25,4 +25,8 @@ public interface CartService {
      * 获取购物车
      */
     CartVo getCart() throws ExecutionException, InterruptedException;
+    /**
+     * 选中购物项
+     */
+    void checkItem(Long skuId, Integer check);
 }

@@ -41,6 +41,21 @@ public class CartServiceImpl implements CartService {
     private ProductFeignService productFeignService;
 
     /**
+     * 选中购物项
+     */
+    @Override
+    public void checkItem(Long skuId, Integer check) {
+        //查询当前购物项
+        CartItemVo cartItemVo = searchCartItem(skuId);
+        //修改选中状态
+        cartItemVo.setCheck(check == 1);
+        //转为json保存到redis
+        String string = JSON.toJSONString(cartItemVo);
+        BoundHashOperations<String, Object, Object> cartRedis = cartRedis();
+        cartRedis.put(skuId, string);
+    }
+
+    /**
      * 获取购物车
      * 根据是否登录分别获取
      */
@@ -139,7 +154,7 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
-     * 从redis中查询购物车
+     * 从redis中查询购物项
      */
     @Override
     public CartItemVo searchCartItem(Long skuId) {
