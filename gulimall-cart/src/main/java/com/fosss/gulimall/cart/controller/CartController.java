@@ -28,6 +28,17 @@ public class CartController {
     @Resource
     private CartService cartService;
 
+
+    /**
+     * 修改数量
+     */
+    @GetMapping("/countItem")
+    public String countItem(@RequestParam("skuId") Long skuId,
+                            @RequestParam("num") Integer num) {
+        cartService.countItem(skuId, num);
+        return "redirect:http://cart.localhost/cart.html";
+    }
+
     /**
      * 选中购物项
      */

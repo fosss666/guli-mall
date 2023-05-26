@@ -41,6 +41,18 @@ public class CartServiceImpl implements CartService {
     private ProductFeignService productFeignService;
 
     /**
+     * 修改数量
+     */
+    @Override
+    public void countItem(Long skuId, Integer num) {
+        CartItemVo cartItemVo = searchCartItem(skuId);
+        cartItemVo.setCount(num);
+        BoundHashOperations<String, Object, Object> cartRedis = cartRedis();
+        cartRedis.put(skuId, JSON.toJSONString(cartItemVo));
+
+    }
+
+    /**
      * 选中购物项
      */
     @Override

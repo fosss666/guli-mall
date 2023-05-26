@@ -29,4 +29,8 @@ public interface CartService {
      * 选中购物项
      */
     void checkItem(Long skuId, Integer check);
+    /**
+     * 修改数量
+     */
+    void countItem(Long skuId, Integer num);
 }
