@@ -41,6 +41,15 @@ public class CartServiceImpl implements CartService {
     private ProductFeignService productFeignService;
 
     /**
+     * 删除购物项
+     */
+    @Override
+    public void deleteItem(Long skuId) {
+        BoundHashOperations<String, Object, Object> cartRedis = cartRedis();
+        cartRedis.delete(skuId.toString());
+    }
+
+    /**
      * 修改数量
      */
     @Override
@@ -48,7 +57,7 @@ public class CartServiceImpl implements CartService {
         CartItemVo cartItemVo = searchCartItem(skuId);
         cartItemVo.setCount(num);
         BoundHashOperations<String, Object, Object> cartRedis = cartRedis();
-        cartRedis.put(skuId, JSON.toJSONString(cartItemVo));
+        cartRedis.put(skuId.toString(), JSON.toJSONString(cartItemVo));
 
     }
 
@@ -64,7 +73,7 @@ public class CartServiceImpl implements CartService {
         //转为json保存到redis
         String string = JSON.toJSONString(cartItemVo);
         BoundHashOperations<String, Object, Object> cartRedis = cartRedis();
-        cartRedis.put(skuId, string);
+        cartRedis.put(skuId.toString(), string);
     }
 
     /**

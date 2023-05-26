@@ -33,4 +33,8 @@ public interface CartService {
      * 修改数量
      */
     void countItem(Long skuId, Integer num);
+    /**
+     * 删除购物项
+     */
+    void deleteItem(Long skuId);
 }

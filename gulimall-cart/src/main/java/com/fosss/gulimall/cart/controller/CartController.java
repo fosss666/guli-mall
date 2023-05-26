@@ -28,6 +28,14 @@ public class CartController {
     @Resource
     private CartService cartService;
 
+    /**
+     * 删除购物项
+     */
+    @GetMapping("/deleteItem")
+    public String deleteItem(@RequestParam("skuId") Long skuId) {
+        cartService.deleteItem(skuId);
+        return "redirect:http://cart.localhost/cart.html";
+    }
 
     /**
      * 修改数量
