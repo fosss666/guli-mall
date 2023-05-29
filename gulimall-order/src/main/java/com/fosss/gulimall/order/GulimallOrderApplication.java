@@ -11,7 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
  * 1.引入amqp环境坐标
  * 2.配置rabbitmq环境
  * 3.开启对rabbitmq的支持 @EnableRabbit
- * 4.使用RabbitAdmin创建exchange、queue等，进行收发消息等操作
+ * 4.创建exchange、queue等，进行收发消息等操作
  */
 
 @EnableRabbit
