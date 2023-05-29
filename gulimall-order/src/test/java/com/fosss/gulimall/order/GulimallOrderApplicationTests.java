@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +26,7 @@ public class GulimallOrderApplicationTests {
      */
     @Test
     public void testExchange() {
-        //直接型交换机
+        //直接型交换机 durable-是否持久化
         DirectExchange directExchange = new DirectExchange("hello-java-exchange", true, false);
         amqpAdmin.declareExchange(directExchange);
         log.info("Exchange[{}]创建成功", "hello-java-exchange");
@@ -36,7 +37,10 @@ public class GulimallOrderApplicationTests {
      */
     @Test
     public void testQueue() {
-
+        //exclusive-是否排他
+        Queue queue=new Queue("hello-java-queue",true,false,false);
+        amqpAdmin.declareQueue(queue);
+        log.info("Queue[{}]创建成功", "hello-java-queue");
     }
 
     /**
