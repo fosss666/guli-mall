@@ -11,6 +11,9 @@ spring:
         server-addr: 127.0.0.1:8848
   application:
     name: gulimall-order
+  rabbitmq:
+    host: 127.0.0.1
+    virtual-host: /
 mybatis-plus:
   global-config:
     db-config:
