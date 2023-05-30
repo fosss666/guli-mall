@@ -14,6 +14,12 @@ spring:
   rabbitmq:
     host: 127.0.0.1
     virtual-host: /
+    #开启发送端确认
+    publisher-confirms: true
+    #开启消息传递到队列的确认
+    publisher-returns: true
+    template:
+      mandatory: true
 mybatis-plus:
   global-config:
     db-config:
