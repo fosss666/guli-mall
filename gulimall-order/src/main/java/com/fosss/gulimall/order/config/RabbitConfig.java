@@ -32,9 +32,9 @@ public class RabbitConfig {
      * 2）消息正确到达队列的回调
      * ①在配置中开启    publisher-returns: true   template:mandatory: true
      * ②进行设置
-     *
      * <p>
      * 2.消费端确认
+     *
      */
     @PostConstruct //在当前配置类构造完成后执行下面的方法
     public void initRabbitTemplate() {
@@ -42,7 +42,7 @@ public class RabbitConfig {
             /**
              *
              * @param correlationData 消息的唯一标识（发送时携带的id）
-             * @param ack 消息是否回调成功
+             * @param ack 消息是否回复成功
              * @param cause 失败的原因
              */
             @Override

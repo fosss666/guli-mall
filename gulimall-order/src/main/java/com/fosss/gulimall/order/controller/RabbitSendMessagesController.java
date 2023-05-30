@@ -38,6 +38,7 @@ public class RabbitSendMessagesController {
                 orderEntity.setId(2L);
                 orderEntity.setCreateTime(new Date());
                 rabbitTemplate.convertAndSend("hello-java-exchange", "testerror.java", orderEntity, new CorrelationData(UUID.randomUUID().toString()));
+                //rabbitTemplate.convertAndSend("hello-java-exchange", "hello.java", orderEntity, new CorrelationData(UUID.randomUUID().toString()));
             }
         }
         return "ok";
