@@ -65,7 +65,10 @@ spring:
           uri: lb://gulimall-cart #购物车
           predicates:
           - Host=cart.localhost
-
+        - id: gulimall_order_route
+          uri: lb://gulimall-order #订单服务
+          predicates:
+          - Host=order.localhost
 
 
 
