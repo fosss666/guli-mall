@@ -26,9 +26,19 @@ spring:
         acknowledge-mode: manual #开启手动消费消息，默认是自动ack
   thymeleaf:
     cache: false
+  redis:
+    host: 192.168.113.128
 mybatis-plus:
   global-config:
     db-config:
       id-type: auto
 server:
   port: 9000
+
+
+#配置线程池
+gulimall:
+  thread:
+    core-size: 20
+    max-size: 200
+    keep-alive-time: 10
