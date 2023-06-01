@@ -21,13 +21,13 @@ public class GulimallSessionConfig {
     public CookieSerializer cookieSerializer() {
         DefaultCookieSerializer defaultCookieSerializer = new DefaultCookieSerializer();
         defaultCookieSerializer.setCookieName("GULISESSION");
-        defaultCookieSerializer.setDomainName("localhost");
+        defaultCookieSerializer.setDomainName("gulimall.com");
         return defaultCookieSerializer;
     }
 
     //配置序列化方式为json
     @Bean
-    public RedisSerializer<Object> redisSerializer() {
+    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
         return new GenericFastJsonRedisSerializer();
     }
 
