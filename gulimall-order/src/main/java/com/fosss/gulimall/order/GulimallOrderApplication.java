@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * 整合rabbitmq:
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
  * 4.创建exchange、queue等，进行收发消息等操作
  */
 
+@EnableRedisHttpSession
 @EnableRabbit
 @EnableDiscoveryClient//开启注册中心
 @SpringBootApplication

@@ -12,7 +12,7 @@ spring:
   thymeleaf:
     cache: false
   redis:
-    host: 192.168.113.127
+    host: 192.168.113.128
   session:
     store-type: redis
 es:

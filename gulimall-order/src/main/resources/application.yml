@@ -28,6 +28,8 @@ spring:
     cache: false
   redis:
     host: 192.168.113.128
+  session:
+    store-type: redis
 mybatis-plus:
   global-config:
     db-config:

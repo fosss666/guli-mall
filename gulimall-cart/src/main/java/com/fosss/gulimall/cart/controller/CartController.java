@@ -101,7 +101,7 @@ public class CartController {
         //UserInfoTo userInfoTo = GulimallInterceptor.threadLocal.get();
         //System.out.println(userInfoTo);
         CartVo cartVo = cartService.getCart();
-        model.addAttribute("item", cartVo);
+        model.addAttribute("cart", cartVo);
         return "cartList";
     }
 }

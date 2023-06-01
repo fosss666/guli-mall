@@ -47,7 +47,7 @@ public class MemberController {
         MemberEntity memberEntity = memberService.GiteeLogin(socialUser);
         return memberEntity == null ?
                 R.error(GITEE_LOGIN_ERROR.getCode(), GITEE_LOGIN_ERROR.getMessage())
-                : R.ok();
+                : R.ok().put("data",memberEntity);
     }
 
     /**

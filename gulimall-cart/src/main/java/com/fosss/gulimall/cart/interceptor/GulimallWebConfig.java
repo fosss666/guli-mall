@@ -1,4 +1,4 @@
-package com.fosss.gulimall.cart.config;
+package com.fosss.gulimall.cart.interceptor;
 
 import com.fosss.gulimall.cart.interceptor.GulimallInterceptor;
 import org.springframework.context.annotation.Configuration;

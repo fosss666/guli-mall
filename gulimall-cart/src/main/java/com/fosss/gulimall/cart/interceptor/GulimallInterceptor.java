@@ -24,7 +24,7 @@ import java.util.UUID;
  */
 public class GulimallInterceptor implements HandlerInterceptor {
 
-    public static ThreadLocal<UserInfoTo> threadLocal;
+    public static ThreadLocal<UserInfoTo> threadLocal = new ThreadLocal<>();
 
     /**
      * 执行前的业务处理

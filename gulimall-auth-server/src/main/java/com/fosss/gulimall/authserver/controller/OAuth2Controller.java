@@ -85,7 +85,9 @@ public class OAuth2Controller {
                 //存储到session中
                 // 1.当前session的作用域为当前域，无法与子域分享信息 所以需要自定义session
                 // 2.使用json的序列化存储数据到redis中
+
                 session.setAttribute(LOGIN_USER, memberRespVo);
+                //Object attribute = session.getAttribute(LOGIN_USER);
                 return "redirect:http://localhost";
             } else {
                 Map<String, String> errors = new HashMap<>();
