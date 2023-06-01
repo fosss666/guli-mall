@@ -47,6 +47,15 @@ public class LoginController {
     private MemberFeignService memberFeignService;
 
     /**
+     * 用户登出
+     */
+    @GetMapping("/logout.html")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:http://gulimall.com";
+    }
+
+    /**
      * 用户登录
      */
     @PostMapping("/login")
@@ -57,7 +66,7 @@ public class LoginController {
             MemberRespVo data = r.getData("data", new TypeReference<MemberRespVo>() {
             });
             session.setAttribute(LOGIN_USER, data);
-            return "redirect:http://localhost";
+            return "redirect:http://gulimall.com";
         } else {
             //登录失败
             Map<String, String> errors = new HashMap<>();

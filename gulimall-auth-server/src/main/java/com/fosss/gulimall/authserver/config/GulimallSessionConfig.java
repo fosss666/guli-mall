@@ -23,7 +23,7 @@ public class GulimallSessionConfig {
         serializer.setCookieName("GULISESSION");
         serializer.setCookiePath("/");
         // 设置cookie的作用域为父域名
-        serializer.setDomainName("localhost");
+        serializer.setDomainName("gulimall.com");
         return serializer;
     }
 

@@ -88,16 +88,16 @@ public class OAuth2Controller {
 
                 session.setAttribute(LOGIN_USER, memberRespVo);
                 //Object attribute = session.getAttribute(LOGIN_USER);
-                return "redirect:http://localhost";
+                return "redirect:http://gulimall.com";
             } else {
                 Map<String, String> errors = new HashMap<>();
                 errors.put("msg", ExceptionResult.GITEE_LOGIN_ERROR.getMessage());
                 attributes.addFlashAttribute("errors", errors);
-                return "redirect:http://auth.localhost/login.html";
+                return "redirect:http://auth.gulimall.com/login.html";
             }
         } else {
             //失败则跳到登录页
-            return "redirect:http://auth.localhost/login.html";
+            return "redirect:http://auth.gulimall.com/login.html";
         }
 
     }
