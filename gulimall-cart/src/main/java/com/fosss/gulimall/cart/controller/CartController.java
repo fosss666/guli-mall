@@ -34,7 +34,7 @@ public class CartController {
     @GetMapping("/deleteItem")
     public String deleteItem(@RequestParam("skuId") Long skuId) {
         cartService.deleteItem(skuId);
-        return "redirect:http://cart.localhost/cart.html";
+        return "redirect:http://cart.gulimall.com/cart.html";
     }
 
     /**
@@ -44,7 +44,7 @@ public class CartController {
     public String countItem(@RequestParam("skuId") Long skuId,
                             @RequestParam("num") Integer num) {
         cartService.countItem(skuId, num);
-        return "redirect:http://cart.localhost/cart.html";
+        return "redirect:http://cart.gulimall.com/cart.html";
     }
 
     /**
@@ -54,7 +54,7 @@ public class CartController {
     public String checkItem(@RequestParam("skuId") Long skuId,
                             @RequestParam("check") Integer check) {
         cartService.checkItem(skuId, check);
-        return "redirect:http://cart.localhost/cart.html";
+        return "redirect:http://cart.gulimall.com/cart.html";
     }
 
     /**
@@ -63,7 +63,7 @@ public class CartController {
      * 解决方案:重定向到另一个方法，携带参数skuId,在那个方法中根据skuId从redis中查询购物车数据，这样网页再刷新时，一直刷新的是重定向后的url，就不会出现
      * 重复添加的问题了
      */
-    @GetMapping("/addToCart")
+    @GetMapping("/addCartItem")
     public String addToCart(@RequestParam("skuId") Long skuId,
                             @RequestParam("num") Integer num,
                             RedirectAttributes redirectAttributes) throws ExecutionException, InterruptedException {
@@ -71,13 +71,13 @@ public class CartController {
         //model.addAttribute("item", cartItemVo);
         //会将skuId拼接到url后面
         redirectAttributes.addAttribute("skuId", skuId);
-        return "redirect:http://cart.localhost/addToCartSuccess.html";
+        return "redirect:http://cart.gulimall.com/addToCartSuccess.html/"+skuId;
     }
 
     /**
      * 从redis中查询购物车
      */
-    @GetMapping("addToCartSuccess.html")
+    @GetMapping("addToCartSuccess.html/{skuId}")
     public String addToCartSuccess(@PathVariable("skuId") Long skuId,
                                    Model model) {
         CartItemVo cartItemVo = cartService.searchCartItem(skuId);

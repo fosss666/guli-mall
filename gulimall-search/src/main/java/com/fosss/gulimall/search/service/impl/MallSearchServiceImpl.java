@@ -345,7 +345,7 @@ public class MallSearchServiceImpl implements MallSearchService {
                     e.printStackTrace();
                 }
                 String replace = param.get_queryString().replace("&attrs=" + encode, "");
-                navVo.setLink("http://search.localhost/list.html?" + replace);
+                navVo.setLink("http://search.gulimall.com/list.html?" + replace);
                 return navVo;
             }).collect(Collectors.toList());
             result.setNavs(collect);

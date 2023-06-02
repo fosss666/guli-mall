@@ -133,7 +133,7 @@ public class CartServiceImpl implements CartService {
         /**
          * 根据购物车中是否有该sku进行分别处理，如果有，则只改数量即可，没有则需要添加
          */
-        String cart = (String) cartRedis.get(skuId);
+        String cart = (String) cartRedis.get(skuId.toString());
         if (cart != null) {
             //有该商品
             //获取原数据修改数量
@@ -162,7 +162,7 @@ public class CartServiceImpl implements CartService {
             CompletableFuture<Void> attr = CompletableFuture.runAsync(() -> {
                 List<String> attrsAsStringList = productFeignService.getAttrsAsStringList(skuId);
                 cartItemVo.setSkuAttrValues(attrsAsStringList);
-            });
+            },threadPoolExecutor);
 
             //在上面两个线程全部执行完毕后，将结果对象存储到redis中并返回
             CompletableFuture.allOf(skuInfo, attr).get();
@@ -180,7 +180,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartItemVo searchCartItem(Long skuId) {
         BoundHashOperations<String, Object, Object> cartRedis = cartRedis();
-        String cart = (String) cartRedis.get(skuId);
+        String cart = (String) cartRedis.get(skuId+"");
         CartItemVo cartItemVo = JSON.parseObject(cart, CartItemVo.class);
         return cartItemVo;
     }

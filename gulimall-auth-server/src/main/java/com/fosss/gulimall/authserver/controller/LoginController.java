@@ -72,7 +72,7 @@ public class LoginController {
             Map<String, String> errors = new HashMap<>();
             errors.put("msg", ExceptionResult.LOGINACCT_PASSWORD_EXCEPTION.getMessage());
             attributes.addFlashAttribute("errors", errors);
-            return "redirect:http://auth.localhost/login.html";
+            return "redirect:http://auth.gulimall.com/login.html";
         }
     }
 
@@ -93,7 +93,7 @@ public class LoginController {
             attributes.addFlashAttribute("errors", errors);
 
             //效验出错回到注册页面
-            return "redirect:http://auth.localhost/login.html";
+            return "redirect:http://auth.gulimall.com/login.html";
         }
 
         //1、效验验证码
@@ -113,13 +113,13 @@ public class LoginController {
                     MemberRespVo data = register.getData("data", new TypeReference<MemberRespVo>() {
                     });
                     session.setAttribute(LOGIN_USER, data);
-                    return "redirect:http://auth.localhost/login.html";
+                    return "redirect:http://auth.gulimall.com/login.html";
                 } else {
                     //失败
                     Map<String, String> errors = new HashMap<>();
                     errors.put("msg", "注册失败");
                     attributes.addFlashAttribute("errors", errors);
-                    return "redirect:http://auth.localhost/reg.html";
+                    return "redirect:http://auth.gulimall.com/reg.html";
                 }
 
 
@@ -128,14 +128,14 @@ public class LoginController {
                 Map<String, String> errors = new HashMap<>();
                 errors.put("code", "验证码错误");
                 attributes.addFlashAttribute("errors", errors);
-                return "redirect:http://auth.localhost/reg.html";
+                return "redirect:http://auth.gulimall.com/reg.html";
             }
         } else {
             //效验出错回到注册页面
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "验证码错误");
             attributes.addFlashAttribute("errors", errors);
-            return "redirect:http://auth.localhost/reg.html";
+            return "redirect:http://auth.gulimall.com/reg.html";
         }
     }
 

@@ -4,12 +4,10 @@ import com.fosss.common.constant.AuthServerConstant;
 import com.fosss.common.constant.CartConstant;
 import com.fosss.common.vo.MemberRespVo;
 import com.fosss.gulimall.cart.vo.UserInfoTo;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
