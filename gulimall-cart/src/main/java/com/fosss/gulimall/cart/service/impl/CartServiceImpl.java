@@ -140,6 +140,8 @@ public class CartServiceImpl implements CartService {
             //获取原数据修改数量
             CartItemVo cartItemVo = JSON.parseObject(cart, CartItemVo.class);
             cartItemVo.setCount(cartItemVo.getCount() + num);
+            //保存到redis
+            cartRedis.put(skuId.toString(), cartItemVo);
             return cartItemVo;
         } else {
             //没有该商品，需要添加
@@ -163,7 +165,7 @@ public class CartServiceImpl implements CartService {
             CompletableFuture<Void> attr = CompletableFuture.runAsync(() -> {
                 List<String> attrsAsStringList = productFeignService.getAttrsAsStringList(skuId);
                 cartItemVo.setSkuAttrValues(attrsAsStringList);
-            },threadPoolExecutor);
+            }, threadPoolExecutor);
 
             //在上面两个线程全部执行完毕后，将结果对象存储到redis中并返回
             CompletableFuture.allOf(skuInfo, attr).get();
