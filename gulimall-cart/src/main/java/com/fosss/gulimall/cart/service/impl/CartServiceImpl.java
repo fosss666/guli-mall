@@ -141,7 +141,8 @@ public class CartServiceImpl implements CartService {
             CartItemVo cartItemVo = JSON.parseObject(cart, CartItemVo.class);
             cartItemVo.setCount(cartItemVo.getCount() + num);
             //保存到redis
-            cartRedis.put(skuId.toString(), cartItemVo);
+            String string = JSON.toJSONString(cartItemVo);
+            cartRedis.put(skuId.toString(), string);
             return cartItemVo;
         } else {
             //没有该商品，需要添加
