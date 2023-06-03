@@ -1,10 +1,12 @@
 package com.fosss.gulimall.order.service.impl;
 
 import com.fosss.common.vo.MemberRespVo;
+import com.fosss.gulimall.order.feign.CartFeignService;
 import com.fosss.gulimall.order.feign.MemberFeignService;
 import com.fosss.gulimall.order.interceptor.OrderInterceptor;
 import com.fosss.gulimall.order.vo.MemberAddressVo;
 import com.fosss.gulimall.order.vo.OrderConfirmVo;
+import com.fosss.gulimall.order.vo.OrderItemVo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +30,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Resource
     private MemberFeignService memberFeignService;
+    @Resource
+    private CartFeignService cartFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -52,9 +56,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         List<MemberAddressVo> memberReceiveAddressList = memberFeignService.getMemberReceiveAddressList(memberRespVo.getId());
         orderConfirmVo.setMemberAddressVos(memberReceiveAddressList);
 
+        //远程获取购物车中被选中的数据
+        List<OrderItemVo> checkedCart = cartFeignService.getCheckedCart();
+        orderConfirmVo.setItems(checkedCart);
 
+        //获取用户积分
+        Integer integration = memberRespVo.getIntegration();
+        orderConfirmVo.setIntegration(integration);
 
-        return null;
+        return orderConfirmVo;
     }
 
 }

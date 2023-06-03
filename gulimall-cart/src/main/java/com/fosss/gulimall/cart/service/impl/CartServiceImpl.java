@@ -13,7 +13,6 @@ import com.fosss.gulimall.cart.vo.SkuInfoVo;
 import com.fosss.gulimall.cart.vo.UserInfoTo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.BoundHashOperations;
-import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -48,6 +47,22 @@ public class CartServiceImpl implements CartService {
     public void deleteItem(Long skuId) {
         BoundHashOperations<String, Object, Object> cartRedis = cartRedis();
         cartRedis.delete(skuId.toString());
+    }
+
+    /**
+     * 远程获取购物车中被选中的数据
+     */
+    @Override
+    public List<CartItemVo> getCheckedCart() {
+        UserInfoTo userInfoTo = GulimallInterceptor.threadLocal.get();
+        if (userInfoTo.getUserId() == null) {
+            //没登录
+            return null;
+        }
+        //登录了
+        String userKey = CartConstant.CART_PREFIX + userInfoTo.getUserId();
+        List<CartItemVo> cartItems = getCartItems(userKey);
+        return cartItems;
     }
 
     /**

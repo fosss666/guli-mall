@@ -3,6 +3,7 @@ package com.fosss.gulimall.cart.service;
 import com.fosss.gulimall.cart.vo.CartItemVo;
 import com.fosss.gulimall.cart.vo.CartVo;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -37,4 +38,8 @@ public interface CartService {
      * 删除购物项
      */
     void deleteItem(Long skuId);
+    /**
+     * 远程获取购物车中被选中的数据
+     */
+    List<CartItemVo> getCheckedCart();
 }

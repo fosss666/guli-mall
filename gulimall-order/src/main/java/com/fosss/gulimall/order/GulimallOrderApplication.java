@@ -4,6 +4,7 @@ import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
@@ -15,6 +16,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
  * 4.创建exchange、queue等，进行收发消息等操作
  */
 
+@EnableFeignClients
 @EnableRedisHttpSession
 @EnableRabbit
 @EnableDiscoveryClient//开启注册中心

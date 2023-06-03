@@ -7,13 +7,11 @@ import com.fosss.gulimall.cart.vo.CartVo;
 import com.fosss.gulimall.cart.vo.UserInfoTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -27,6 +25,15 @@ public class CartController {
 
     @Resource
     private CartService cartService;
+
+    /**
+     * 远程获取购物车中被选中的数据
+     */
+    @GetMapping("/checkedData")
+    @ResponseBody
+    public List<CartItemVo> getCheckedCart() {
+        return cartService.getCheckedCart();
+    }
 
     /**
      * 删除购物项
@@ -71,7 +78,7 @@ public class CartController {
         //model.addAttribute("item", cartItemVo);
         //会将skuId拼接到url后面
         redirectAttributes.addAttribute("skuId", skuId);
-        return "redirect:http://cart.gulimall.com/addToCartSuccess.html/"+skuId;
+        return "redirect:http://cart.gulimall.com/addToCartSuccess.html/" + skuId;
     }
 
     /**
