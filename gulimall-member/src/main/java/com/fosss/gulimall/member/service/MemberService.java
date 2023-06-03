@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.fosss.common.utils.PageUtils;
 import com.fosss.common.vo.MemberRespVo;
 import com.fosss.gulimall.member.entity.MemberEntity;
+import com.fosss.gulimall.member.entity.MemberReceiveAddressEntity;
 import com.fosss.gulimall.member.vo.MemberUserLoginVo;
 import com.fosss.gulimall.member.vo.SocialUser;
 import com.fosss.gulimall.member.vo.UserRegisterVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,5 +45,6 @@ public interface MemberService extends IService<MemberEntity> {
      * gitee登录中登录或注册账号
      */
     MemberEntity GiteeLogin(SocialUser socialUser) throws Exception;
+
 }
 

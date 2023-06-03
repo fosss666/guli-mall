@@ -1,14 +1,11 @@
 package com.fosss.gulimall.member.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fosss.gulimall.member.entity.MemberReceiveAddressEntity;
 import com.fosss.gulimall.member.service.MemberReceiveAddressService;
@@ -29,6 +26,15 @@ import com.fosss.common.utils.R;
 public class MemberReceiveAddressController {
     @Autowired
     private MemberReceiveAddressService memberReceiveAddressService;
+
+    /**
+     * 获取用户的所有收货地址
+     */
+    @GetMapping("/{memberId}/addresses")
+    public List<MemberReceiveAddressEntity> getMemberReceiveAddressList(@PathVariable("memberId") Long memberId) {
+        return memberReceiveAddressService.getMemberReceiveAddressList(memberId);
+    }
+
 
     /**
      * 列表

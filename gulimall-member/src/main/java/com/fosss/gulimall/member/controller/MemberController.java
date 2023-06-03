@@ -1,12 +1,14 @@
 package com.fosss.gulimall.member.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.fosss.common.exception.ExceptionResult;
 import com.fosss.common.vo.MemberRespVo;
 import com.fosss.gulimall.member.dao.MemberLevelDao;
 import com.fosss.gulimall.member.entity.MemberLevelEntity;
+import com.fosss.gulimall.member.entity.MemberReceiveAddressEntity;
 import com.fosss.gulimall.member.exception.PhoneUniqueException;
 import com.fosss.gulimall.member.exception.UsernameUniqueException;
 import com.fosss.gulimall.member.vo.MemberUserLoginVo;
@@ -47,7 +49,7 @@ public class MemberController {
         MemberEntity memberEntity = memberService.GiteeLogin(socialUser);
         return memberEntity == null ?
                 R.error(GITEE_LOGIN_ERROR.getCode(), GITEE_LOGIN_ERROR.getMessage())
-                : R.ok().put("data",memberEntity);
+                : R.ok().put("data", memberEntity);
     }
 
     /**

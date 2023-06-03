@@ -7,6 +7,7 @@ import com.fosss.common.utils.HttpUtils;
 import com.fosss.common.vo.MemberRespVo;
 import com.fosss.gulimall.member.dao.MemberLevelDao;
 import com.fosss.gulimall.member.entity.MemberLevelEntity;
+import com.fosss.gulimall.member.entity.MemberReceiveAddressEntity;
 import com.fosss.gulimall.member.exception.PhoneUniqueException;
 import com.fosss.gulimall.member.exception.UsernameUniqueException;
 import com.fosss.gulimall.member.vo.MemberUserLoginVo;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
