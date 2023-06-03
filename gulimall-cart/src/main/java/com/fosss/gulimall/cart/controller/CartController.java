@@ -81,7 +81,7 @@ public class CartController {
     public String addToCartSuccess(@PathVariable("skuId") Long skuId,
                                    Model model) {
         CartItemVo cartItemVo = cartService.searchCartItem(skuId);
-        model.addAttribute("item", cartItemVo);
+        model.addAttribute("cartItem", cartItemVo);
         return "success";
     }
 

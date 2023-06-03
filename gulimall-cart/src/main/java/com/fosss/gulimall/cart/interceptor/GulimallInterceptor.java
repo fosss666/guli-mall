@@ -45,6 +45,8 @@ public class GulimallInterceptor implements HandlerInterceptor {
                 if (CartConstant.TEMP_USER_KEY_NAME.equals(name)) {
                     //标记有临时用户
                     userInfoTo.setIsTempUser(true);
+                    //设置user-key
+                    userInfoTo.setUserKey(cookie.getValue());
                 }
             }
         }

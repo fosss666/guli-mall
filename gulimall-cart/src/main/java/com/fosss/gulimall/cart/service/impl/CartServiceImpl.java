@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -134,7 +135,7 @@ public class CartServiceImpl implements CartService {
          * 根据购物车中是否有该sku进行分别处理，如果有，则只改数量即可，没有则需要添加
          */
         String cart = (String) cartRedis.get(skuId.toString());
-        if (cart != null) {
+        if (!StringUtils.isEmpty(cart)) {
             //有该商品
             //获取原数据修改数量
             CartItemVo cartItemVo = JSON.parseObject(cart, CartItemVo.class);
@@ -180,7 +181,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartItemVo searchCartItem(Long skuId) {
         BoundHashOperations<String, Object, Object> cartRedis = cartRedis();
-        String cart = (String) cartRedis.get(skuId+"");
+        String cart = (String) cartRedis.get(skuId.toString());
         CartItemVo cartItemVo = JSON.parseObject(cart, CartItemVo.class);
         return cartItemVo;
     }
