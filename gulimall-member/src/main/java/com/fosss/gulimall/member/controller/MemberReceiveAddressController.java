@@ -31,6 +31,7 @@ public class MemberReceiveAddressController {
      * 获取用户的所有收货地址
      */
     @GetMapping("/{memberId}/addresses")
+    @ResponseBody
     public List<MemberReceiveAddressEntity> getMemberReceiveAddressList(@PathVariable("memberId") Long memberId) {
         return memberReceiveAddressService.getMemberReceiveAddressList(memberId);
     }
