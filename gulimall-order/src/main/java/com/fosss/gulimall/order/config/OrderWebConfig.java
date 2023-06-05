@@ -27,9 +27,11 @@ public class OrderWebConfig {
             public void apply(RequestTemplate template) {
                 ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
                 //获取请求中的Cookie
-                HttpServletRequest request = requestAttributes.getRequest();
-                String cookie = request.getHeader("Cookie");
-                template.header("Cookie", cookie);
+                if (requestAttributes != null) {
+                    HttpServletRequest request = requestAttributes.getRequest();
+                    String cookie = request.getHeader("Cookie");
+                    template.header("Cookie", cookie);
+                }
             }
         };
     }

@@ -6,6 +6,7 @@ import com.fosss.gulimall.order.entity.OrderEntity;
 import com.fosss.gulimall.order.vo.OrderConfirmVo;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 订单
@@ -21,6 +22,6 @@ public interface OrderService extends IService<OrderEntity> {
     /**
      * 封装订单确认模型
      */
-    OrderConfirmVo getOrderConfirmData();
+    OrderConfirmVo getOrderConfirmData() throws ExecutionException, InterruptedException;
 }
 
